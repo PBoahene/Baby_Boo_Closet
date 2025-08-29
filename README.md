@@ -36,7 +36,7 @@ npm start
 
 # Build for production
 npm run build
-```
+
 📁 Project Structure
 text
 src/
@@ -57,6 +57,7 @@ src/
 │   ├── AuthContext.js
 │   └── CartContext.js
 └── App.js              # Main application
+```
 ###🎨 Pages Overview
 Page	Description
 Home	Featured products & promotions
@@ -153,9 +154,14 @@ Set publish directory: build
 
 Environment Variables
 env
+
+
 REACT_APP_API_URL= Not yet
+
 REACT_APP_ADMIN_EMAIL= Not Yet
-🤝 Contributing
+
+
+**🤝 Contributing**
 Fork the project
 
 Create feature branch (git checkout -b feature/AmazingFeature)
@@ -166,16 +172,20 @@ Push to branch (git push origin feature/AmazingFeature)
 
 Open Pull Request
 
-📝 License
+**📝 License**
 MIT License - see LICENSE file for details.
 
-👨‍💻 Development Team
+**👨‍💻 Development Team**
+
 Syntrix Software Engineering
+
 DCIT208 - Software Engineering Project
+
 2024/2025 Academic Year
+
 University of Ghana Legon.
 
-###💡 Future Enhancements
+**💡 Future Enhancements**
 Backend API integration
 
 Payment gateway (Stripe/Momo)
@@ -197,6 +207,6 @@ For questions or issues:
 
 Open a GitHub issue
 
-Email: support@babyboo.com
+Email: .....
 
 Documentation: Wiki
