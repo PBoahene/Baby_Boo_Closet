@@ -26,7 +26,7 @@ A modern React.js e-commerce platform specializing in kids' fashion and unisex u
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/baby-boo-closet.git
+git clone https://github.com/PBoahene/Baby_Boo_Closet.gt
 
 # Install dependencies
 npm install
