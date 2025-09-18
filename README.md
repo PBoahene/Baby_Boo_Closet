@@ -83,19 +83,6 @@ Styling: CSS3 + Responsive Design
 
 Build Tool: Create React App
 
-###👥 Test Accounts
-Customer Demo:
-
-Email: customer@example.com
-
-Password: password
-
-Admin Access:
-
-Email: admin@babyboo.com
-
-Password: admin123
-
 ###📱 Responsive Design
 Fully optimized for:
 
@@ -141,25 +128,6 @@ XSS protection
 Secure authentication flow
 
 HTTPS ready
-
-###🚀 Deployment
-Netlify/Vercel
-Connect GitHub repository
-
-Set build command: npm run build
-
-Set publish directory: build
-
-###Deploy!
-
-Environment Variables
-env
-
-
-REACT_APP_API_URL= Not yet
-
-REACT_APP_ADMIN_EMAIL= Not Yet
-
 
 **🤝 Contributing**
 Fork the project
@@ -207,6 +175,6 @@ For questions or issues:
 
 Open a GitHub issue
 
-Email: .....
+Email: Pbohene007@st.ug.edu.gh
 
 Documentation: Wiki
