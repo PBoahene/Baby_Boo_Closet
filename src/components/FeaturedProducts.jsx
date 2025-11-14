@@ -1,54 +1,28 @@
+import React, { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import schoolUniform from "@/assets/school-uniform.jpg";
-import casualWear from "@/assets/casual-wear.jpg";
 
 const FeaturedProducts = () => {
-  const products = [
-    {
-      id: "1",
-      name: "Custom School Polo Shirt",
-      price: 24.99,
-      originalPrice: 34.99,
-      image: schoolUniform,
-      category: "School Uniforms",
-      isCustomizable: true,
-      colors: ["#1e40af", "#ffffff", "#dc2626", "#059669"],
-      sizes: ["XS", "S", "M", "L", "XL"]
-    },
-    {
-      id: "2",
-      name: "Personalized T-Shirt",
-      price: 19.99,
-      image: casualWear,
-      category: "Casual Wear",
-      isCustomizable: true,
-      colors: ["#f59e0b", "#ec4899", "#3b82f6", "#10b981"],
-      sizes: ["XS", "S", "M", "L"]
-    },
-    {
-      id: "3",
-      name: "School Pinafore Dress",
-      price: 32.99,
-      originalPrice: 42.99,
-      image: schoolUniform,
-      category: "School Uniforms",
-      isCustomizable: true,
-      colors: ["#1e293b", "#dc2626", "#059669"],
-      sizes: ["XS", "S", "M", "L", "XL"]
-    },
-    {
-      id: "4",
-      name: "Custom Hoodie",
-      price: 34.99,
-      image: casualWear,
-      category: "Casual Wear",
-      isCustomizable: true,
-      colors: ["#7c3aed", "#f59e0b", "#ef4444", "#06b6d4"],
-      sizes: ["S", "M", "L", "XL"]
-    }
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch("http://localhost:4000/api/products")
+      .then((r) => r.json())
+      .then((data) => {
+        if (mounted) setProducts(data);
+      })
+      .catch(() => {
+        // ignore, keep empty list
+      })
+      .finally(() => mounted && setLoading(false));
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <section className="py-16 bg-background">
@@ -65,6 +39,9 @@ const FeaturedProducts = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {!loading && products.length === 0 && (
+            <p className="text-center text-muted-foreground">No products available</p>
+          )}
           {products.map((product) => (
             <ProductCard key={product.id} {...product} />
           ))}

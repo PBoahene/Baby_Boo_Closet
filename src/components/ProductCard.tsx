@@ -1,7 +1,10 @@
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Palette } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { CartItem, parseCart, serializeCart } from "@/lib/cart";
 
 interface ProductCardProps {
   id: string;
@@ -16,6 +19,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ 
+  id,
   name, 
   price, 
   originalPrice, 
@@ -25,7 +29,39 @@ const ProductCard = ({
   colors = [],
   sizes = []
 }: ProductCardProps) => {
+  const { toast } = useToast();
   const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+
+  function addToCart() {
+    try {
+      const raw = localStorage.getItem("cart");
+      const cart = parseCart(raw);
+
+      const existing = cart.find((item) => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        const newItem: CartItem = {
+          id,
+          name,
+          price,
+          qty: 1,
+          image,
+        };
+        cart.push(newItem);
+      }
+
+      localStorage.setItem("cart", serializeCart(cart));
+      try {
+        window.dispatchEvent(new Event("storage"));
+      } catch (err) {
+        // ignore
+      }
+      toast({ title: "Added to cart", description: `${name} has been added to your cart.` });
+    } catch (err) {
+      // ignore localStorage errors
+    }
+  }
 
   return (
     <Card className="group cursor-pointer transition-all duration-300 hover:shadow-card hover:-translate-y-1">
@@ -111,7 +147,7 @@ const ProductCard = ({
           )}
 
           {/* Price */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-3">
             <span className="text-lg font-bold text-primary">
               ${price.toFixed(2)}
             </span>
@@ -119,6 +155,17 @@ const ProductCard = ({
               <span className="text-sm text-muted-foreground line-through">
                 ${originalPrice.toFixed(2)}
               </span>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <Button onClick={addToCart} className="flex-1">
+              Add to Cart
+            </Button>
+            {isCustomizable && (
+              <Button variant="ghost" className="w-12">
+                <Palette className="h-4 w-4" />
+              </Button>
             )}
           </div>
         </div>

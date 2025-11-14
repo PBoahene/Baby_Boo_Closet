@@ -1,3 +1,4 @@
+import React from "react";
 import HeroSection from "@/components/HeroSection";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import CustomizationShowcase from "@/components/CustomizationShowcase";
@@ -136,9 +137,6 @@ const Index = () => {
           <div className="flex flex-wrap gap-4 justify-center">
             <Button variant="secondary" size="lg">
               Start Designing Now
-            </Button>
-            <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary">
-              Contact for Schools
             </Button>
           </div>
         </div>

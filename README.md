@@ -26,39 +26,57 @@ A modern React.js e-commerce platform specializing in kids' fashion and unisex u
 
 ```bash
 # Clone repository
-git clone https://github.com/PBoahene/Baby_Boo_Closet.gt
+git clone https://github.com/PBoahene/Baby_Boo_Closet.git
+cd Baby_Boo_Closet
 
-# Install dependencies
+# Install frontend dependencies
 npm install
 
-# Start development
-npm start
+# Start the Vite dev server (http://localhost:5173)
+npm run dev
+
+# Run linting and tests
+npm run lint
+npm run test
 
 # Build for production
 npm run build
 
-📁 Project Structure
-text
-src/
-├── components/                   # Reusable components
-│   ├── Header.js                
-│   ├── ProductCard.js           
-│   ├── CartItem.js            
-│   └── FilterSidebar.js               
-├── pages/                        # Application pages
-│   ├── Home.js
-│   ├── ProductList.js
-│   ├── ProductDetail.js
-│   ├── Cart.js
-│   ├── Login.js
-│   ├── AdminPage.js
-│   └── ...
-├── context/            # State management
-│   ├── AuthContext.js
-│   └── CartContext.js
-└── App.js              # Main application
+# Backend API (Stripe checkout + product data)
+cd server
+npm install
+cp .env.example .env   # add STRIPE_SECRET_KEY before running
+npm run dev            # starts Express API on http://localhost:4000
 ```
-###🎨 Pages Overview
+
+📁 **Project Structure (excerpt)**
+
+```
+Baby_Boo_Closet/
+├── package.json
+├── vite.config.ts
+├── src/
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── assets/
+│   ├── components/
+│   │   ├── ProductCard.tsx
+│   │   ├── FeaturedProducts.jsx
+│   │   └── ui/            # shadcn-ui primitives
+│   ├── hooks/
+│   ├── lib/
+│   │   └── cart.ts
+│   └── pages/
+│       ├── Index.tsx
+│       ├── Cart.tsx
+│       └── CheckoutSuccess.tsx
+└── server/
+	├── server.js
+	├── package.json
+	└── data/
+```
+
+### 🎨 Pages Overview
 Page	Description
 Home	Featured products & promotions
 Products	Catalog with filtering
