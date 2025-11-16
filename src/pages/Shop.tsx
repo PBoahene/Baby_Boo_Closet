@@ -24,6 +24,7 @@ interface FilterState {
   priceRange: [number, number];
   sizes: string[];
   colors: string[];
+  ages: string[];
 }
 
 const Shop = () => {
@@ -39,7 +40,8 @@ const Shop = () => {
     categories: [],
     priceRange: [0, 100],
     sizes: [],
-    colors: []
+    colors: [],
+    ages: []
   });
 
   const categories = [
@@ -53,6 +55,7 @@ const Shop = () => {
 
   const sizes = ["XS", "S", "M", "L", "XL"];
   const colors = ["Blue", "White", "Red", "Green", "Pink", "Purple", "Yellow", "Black"];
+  const ages = ["0-6 months", "6-12 months", "1-2 years", "2-3 years", "3-4 years", "4-5 years", "5-6 years", "6-8 years", "8-10 years", "10-12 years"];
 
   useEffect(() => {
     fetchProducts();
@@ -141,20 +144,29 @@ const Shop = () => {
     }));
   };
 
+  const toggleAgeFilter = (age: string) => {
+    setFilters(prev => ({
+      ...prev,
+      ages: prev.ages.includes(age)
+        ? prev.ages.filter(a => a !== age)
+        : [...prev.ages, age]
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-gradient-hero text-white py-8">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Buy Affordable and High Quality Baby Clothes from BBY-BOO CLOSET
+            Buy Affordable and High Quality Baby Clothes from BABY-BOO CLOSET
           </h1>
           <p className="text-white/90 mb-4">
             Showing {filteredProducts.length} out of {products.length} products
           </p>
           <p className="text-white/80 text-sm max-w-4xl">
             Finding the perfect mixture of comfort, style and affordability in baby dress can be challenging. 
-            At BBY-BOO CLOSET, we bring you a handpicked collection of baby dresses that are not only stylish but also crafted from baby-safe fabrics.
+            At BABY-BOO CLOSET, we bring you a handpicked collection of baby dresses that are not only stylish but also crafted from baby-safe fabrics.
             Whether you are looking for everyday baby clothes, party-ready wear or baby winter clothes, BBY-BOO CLOSET has everything your little one needs.
           </p>
         </div>
@@ -262,6 +274,31 @@ const Shop = () => {
                   </div>
                 </div>
 
+                {/* Age Filter */}
+                <div className="mb-6">
+                  <h4 className="font-medium mb-3 flex items-center justify-between cursor-pointer" onClick={() => {
+                    const element = document.getElementById('age-filter-content');
+                    element?.classList.toggle('hidden');
+                  }}>
+                    Age
+                    <ChevronDown className="h-4 w-4" />
+                  </h4>
+                  <div id="age-filter-content" className="space-y-2">
+                    {ages.map((age) => (
+                      <div key={age} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={age}
+                          checked={filters.ages.includes(age)}
+                          onCheckedChange={() => toggleAgeFilter(age)}
+                        />
+                        <label htmlFor={age} className="text-sm">
+                          {age}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Price Filter */}
                 <div className="mb-6">
                   <h4 className="font-medium mb-3">Price Range</h4>
@@ -321,9 +358,10 @@ const Shop = () => {
                         setSearchQuery("");
                         setFilters({
                           categories: [],
-                          priceRange: [0, 100],
+                          priceRange: [0, 500],
                           sizes: [],
-                          colors: []
+                          colors: [],
+                          ages: []
                         });
                       }}
                     >

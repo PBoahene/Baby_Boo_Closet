@@ -10,7 +10,7 @@
 @layer base {
   :root {
     /* Base colors - soft and friendly */
-    --background: 0 0% 98%;
+    --background: 220 15% 92%;
     --foreground: 222 84% 4.9%;
 
     /* Card and surface colors */

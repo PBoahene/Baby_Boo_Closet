@@ -43,7 +43,7 @@ const Login = () => {
 
       toast({
         title: "Login Successful",
-        description: "Welcome back to BBY-BOO CLOSET!"
+        description: "Welcome back to BABY-BOO CLOSET!"
       });
 
       setIsLoading(false);
@@ -90,7 +90,7 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-            Welcome to BBY-BOO CLOSET
+            Welcome to BABY-BOO CLOSET
           </CardTitle>
           <CardDescription>
             Sign in to your account or create a new one

@@ -1,9 +1,6 @@
 import React from "react";
 import HeroSection from "@/components/HeroSection";
 import FeaturedProducts from "@/components/FeaturedProducts";
-import CustomizationShowcase from "@/components/CustomizationShowcase";
-import SchoolPortalSection from "@/components/SchoolPortalSection";
-import ProductCustomizer from "@/components/ProductCustomizer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,28 +14,6 @@ const Index = () => {
       
       {/* Featured Products */}
       <FeaturedProducts />
-      
-      {/* How Customization Works */}
-      <CustomizationShowcase />
-      
-      {/* Interactive Customizer Demo */}
-      <section className="py-16 bg-muted/20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Try Our <span className="bg-gradient-hero bg-clip-text text-transparent">Live Designer</span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              See how easy it is to create personalized clothing with our interactive design tool
-            </p>
-          </div>
-          
-          <ProductCustomizer />
-        </div>
-      </section>
-      
-      {/* School Portal Section */}
-      <SchoolPortalSection />
       
       {/* Social Proof & Testimonials */}
       <section className="py-16 bg-background">
@@ -63,7 +38,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  "The customization tool is so easy to use. My daughter loves her personalized school shirts with her name in her favorite color."
+                  "My daughter loves her personalized school shirts with her name in her favorite color. Great quality and fast delivery!"
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-kids-pink rounded-full flex items-center justify-center">
@@ -107,11 +82,11 @@ const Index = () => {
                     ))}
                   </div>
                 </div>
-                <CardTitle className="text-lg">"Excellent school portal system"</CardTitle>
+                <CardTitle className="text-lg">"Excellent school gears system"</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  "The school portal makes uniform ordering so much easier for parents. Great customer service and competitive pricing."
+                  "The school gears system makes uniform ordering so much easier for parents. Great customer service and competitive pricing."
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-kids-purple rounded-full flex items-center justify-center">
@@ -136,7 +111,7 @@ const Index = () => {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Button variant="secondary" size="lg">
-              Start Designing Now
+              Shop Now
             </Button>
           </div>
         </div>

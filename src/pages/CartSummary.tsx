@@ -179,11 +179,6 @@ const CartSummary = () => {
                   </span>
                 </div>
                 
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
-                </div>
-                
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
@@ -197,11 +192,7 @@ const CartSummary = () => {
                   <span>Total</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
-                
-                <div className="text-xs text-muted-foreground">
-                  Including all taxes and fees
-                </div>
-
+          
                 <Button onClick={proceedToCheckout} className="w-full mt-4" size="lg">
                   <CreditCard className="h-4 w-4 mr-2" />
                   Proceed to Payment
@@ -217,7 +208,7 @@ const CartSummary = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="text-center space-y-2">
-                  <h4 className="font-medium">Why shop with BBY-BOO CLOSET?</h4>
+                  <h4 className="font-medium">Why shop with BABY-BOO CLOSET?</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Shield className="h-4 w-4 text-green-600" />

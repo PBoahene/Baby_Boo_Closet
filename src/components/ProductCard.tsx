@@ -75,12 +75,6 @@ const ProductCard = ({
           
           {/* Overlay badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
-            {isCustomizable && (
-              <Badge className="bg-accent text-accent-foreground flex items-center gap-1">
-                <Palette className="h-3 w-3" />
-                Customizable
-              </Badge>
-            )}
             {discount > 0 && (
               <Badge variant="destructive">
                 {discount}% OFF
@@ -96,15 +90,6 @@ const ProductCard = ({
           >
             <Heart className="h-4 w-4" />
           </Button>
-
-          {/* Quick customize button */}
-          {isCustomizable && (
-            <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button className="w-full bg-primary/90 hover:bg-primary">
-                Quick Customize
-              </Button>
-            </div>
-          )}
         </div>
 
         <div className="p-4">
@@ -162,11 +147,6 @@ const ProductCard = ({
             <Button onClick={addToCart} className="flex-1">
               Add to Cart
             </Button>
-            {isCustomizable && (
-              <Button variant="ghost" className="w-12">
-                <Palette className="h-4 w-4" />
-              </Button>
-            )}
           </div>
         </div>
       </CardContent>

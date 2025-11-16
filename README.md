@@ -195,4 +195,3 @@ Open a GitHub issue
 
 Email: Pbohene007@st.ug.edu.gh
 
-Documentation: Wiki

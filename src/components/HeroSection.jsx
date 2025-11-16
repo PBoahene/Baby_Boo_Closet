@@ -1,9 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Palette, Shirt } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Sparkles, Palette, Shirt, Upload } from "lucide-react";
+import { useState } from "react";
 import heroImage from "@/assets/hero-kids.jpg";
 
 const HeroSection = () => {
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <section className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-background via-muted/20 to-secondary/30">
       <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -32,10 +52,79 @@ const HeroSection = () => {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <Button variant="hero" size="lg" className="group">
-              <Palette className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform" />
-              Start Customizing
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="hero" size="lg" className="group">
+                  <Palette className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform" />
+                  Start Customizing
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>Upload Your Reference Design</DialogTitle>
+                  <DialogDescription>
+                    Upload a sample image of the item you'd like us to create. We'll use it as a reference for your custom order.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="reference-image">Reference Image</Label>
+                    <div className="flex items-center justify-center w-full">
+                      <label
+                        htmlFor="reference-image"
+                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 transition-colors"
+                      >
+                        {imagePreview ? (
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-full object-contain rounded-lg"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
+                            <p className="mb-2 text-sm text-muted-foreground">
+                              <span className="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p className="text-xs text-muted-foreground">PNG, JPG or JPEG (MAX. 5MB)</p>
+                          </div>
+                        )}
+                        <Input
+                          id="reference-image"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="item-name">Item Name</Label>
+                    <Input id="item-name" placeholder="e.g., School Uniform, T-Shirt" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Additional Details</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Tell us about colors, sizes, quantities, or any special requirements..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="contact">Contact (Phone/Email)</Label>
+                    <Input id="contact" placeholder="Your phone number or email" />
+                  </div>
+
+                  <Button className="w-full" size="lg">
+                    Submit Request
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button variant="outline" size="lg">
               <Shirt className="h-5 w-5 mr-2" />
               View School Uniforms

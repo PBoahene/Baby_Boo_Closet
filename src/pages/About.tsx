@@ -8,7 +8,7 @@ const About = () => {
       {/* Hero Section */}
       <section className="py-16 bg-gradient-hero text-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">About BBY-BOO CLOSET</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">About BABY-BOO CLOSET</h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Creating beautiful, personalized clothing for children with love and care since day one.
           </p>
@@ -24,7 +24,7 @@ const About = () => {
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground">
               <p>
-                BBY-BOO CLOSET was born from a simple idea: every child deserves clothing that's as unique and special as they are. 
+                BABY-BOO CLOSET was born from a simple idea: every child deserves clothing that's as unique and special as they are. 
                 We started our journey with a passion for creating personalized, high-quality children's wear that brings joy to both kids and parents.
               </p>
               <p>
@@ -67,7 +67,7 @@ const About = () => {
                 </div>
                 <h3 className="font-bold text-lg mb-2">Personalization</h3>
                 <p className="text-sm text-muted-foreground">
-                  Every piece can be customized to reflect your child's unique personality and style.
+                  Every piece is designed with care to reflect your child's unique personality and style.
                 </p>
               </CardContent>
             </Card>
@@ -155,7 +155,7 @@ const About = () => {
             Join Our Growing Family
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Experience the BBY-BOO CLOSET difference today and see why thousands of families trust us with their children's clothing needs.
+            Experience the BABY-BOO CLOSET difference today and see why thousands of families trust us with their children's clothing needs.
           </p>
         </div>
       </section>
