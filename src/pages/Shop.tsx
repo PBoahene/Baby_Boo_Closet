@@ -167,7 +167,7 @@ const Shop = () => {
           <p className="text-white/80 text-sm max-w-4xl">
             Finding the perfect mixture of comfort, style and affordability in baby dress can be challenging. 
             At BABY-BOO CLOSET, we bring you a handpicked collection of baby dresses that are not only stylish but also crafted from baby-safe fabrics.
-            Whether you are looking for everyday baby clothes, party-ready wear or baby winter clothes, BBY-BOO CLOSET has everything your little one needs.
+            Whether you are looking for everyday baby clothes, party-ready wear or baby winter clothes, BABY-BOO CLOSET has everything your little one needs.
           </p>
         </div>
       </div>

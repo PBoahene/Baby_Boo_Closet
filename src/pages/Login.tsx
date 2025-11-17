@@ -77,7 +77,7 @@ const Login = () => {
 
       toast({
         title: "Registration Successful",
-        description: "Welcome to BBY-BOO CLOSET!"
+        description: "Welcome to BABY-BOO CLOSET!"
       });
 
       setIsLoading(false);

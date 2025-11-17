@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 
 const Header = () => {
   const [count, setCount] = useState(0);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
 
   const isActive = (path) => {
@@ -44,7 +45,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <Link to="/" className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              BBY-BOO CLOSET
+              BABY-BOO CLOSET
             </Link>
             <Badge variant="secondary" className="hidden sm:inline-flex">
               Custom Kids Wear
@@ -109,15 +110,17 @@ const Header = () => {
             <a href="#girls" className="relative text-sm font-medium hover:text-primary transition-colors">
               GIRLS
             </a>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="relative text-sm font-medium hover:text-primary transition-colors flex items-center gap-1" onMouseEnter={(e) => e.currentTarget.click()}>
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+              <DropdownMenuTrigger 
+                className="relative text-sm font-medium hover:text-primary transition-colors flex items-center gap-1" 
+                onMouseEnter={() => setIsDropdownOpen(true)}
+              >
                 SCHOOL GEARS
                 <ChevronDown className="h-3 w-3" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent onMouseLeave={(e) => {
-                const trigger = e.currentTarget.previousElementSibling;
-                if (trigger) trigger.click();
-              }}>
+              <DropdownMenuContent 
+                onMouseLeave={() => setIsDropdownOpen(false)}
+              >
                 <DropdownMenuItem>
                   <a href="#school-uniforms" className="w-full">School Uniforms</a>
                 </DropdownMenuItem>

@@ -1,4 +1,4 @@
-# BBY-BOO CLOSET - Backend Server
+# BABY-BOO CLOSET - Backend Server
 
 This small Express server provides simple API endpoints for products, orders, and a Stripe payment intent route for testing.
 

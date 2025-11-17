@@ -56,21 +56,6 @@ app.post("/api/orders", (req, res) => {
   res.json({ ok: true, order: newOrder });
 });
 
-// Admin: Sync products from Google Sheets
-app.post("/api/admin/sync-products", (req, res) => {
-  const { products } = req.body;
-  if (!products || !Array.isArray(products)) {
-    return res.status(400).json({ error: "Invalid products data" });
-  }
-
-  try {
-    writeJson(PRODUCTS_FILE, products);
-    res.json({ ok: true, message: `Synced ${products.length} products` });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to sync products" });
-  }
-});
-
 // Admin: Add single product
 app.post("/api/admin/products", (req, res) => {
   const product = req.body;
