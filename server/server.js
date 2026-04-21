@@ -6,8 +6,30 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const DEFAULT_FRONTEND_URL = "http://localhost:5173";
+const FRONTEND_URL = (process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL).replace(/\/+$/, "");
+
+function getAllowedOrigin(urlString) {
+  try {
+    return new URL(urlString).origin;
+  } catch (_err) {
+    return DEFAULT_FRONTEND_URL;
+  }
+}
+
+function isAllowedRedirect(urlString, allowedOrigin) {
+  try {
+    const parsed = new URL(urlString);
+    return parsed.origin === allowedOrigin;
+  } catch (_err) {
+    return false;
+  }
+}
+
+const allowedOrigin = getAllowedOrigin(FRONTEND_URL);
+
 const app = express();
-app.use(cors());
+app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -146,6 +168,11 @@ app.post("/api/create-checkout-session", async (req, res) => {
   const { cart, success_url, cancel_url } = req.body;
   if (!cart || !Array.isArray(cart) || cart.length === 0) return res.status(400).json({ error: "Cart is empty" });
 
+  const defaultSuccessUrl = `${FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+  const defaultCancelUrl = `${FRONTEND_URL}/cart`;
+  const successUrl = isAllowedRedirect(success_url, allowedOrigin) ? success_url : defaultSuccessUrl;
+  const cancelUrl = isAllowedRedirect(cancel_url, allowedOrigin) ? cancel_url : defaultCancelUrl;
+
   try {
     const line_items = cart.map((item) => ({
       price_data: {
@@ -162,8 +189,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: success_url || "http://localhost:5173/checkout/success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: cancel_url || "http://localhost:5173/cart",
+      success_url: successUrl,
+      cancel_url: cancelUrl,
     });
 
     res.json({ url: session.url });

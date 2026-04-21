@@ -9,6 +9,7 @@ How to run
 ```
 STRIPE_SECRET_KEY=sk_test_your_test_key_here
 PORT=4000
+FRONTEND_URL=http://localhost:5173
 ```
 
 2. Install dependencies and start the server:
@@ -27,8 +28,10 @@ Endpoints
 - GET /api/products/:id -> single product
 - POST /api/orders -> save order payload to `server/data/orders.json` (expects JSON { order: { ... } })
 - POST /api/create-payment-intent -> create a Stripe PaymentIntent (expects { amount, currency?, metadata? })
+- POST /api/create-checkout-session -> create a Stripe Checkout Session (expects { cart, success_url?, cancel_url? })
 
 Notes
 
 - This server is intended for local development only. It uses a simple JSON file for persisting orders.
 - For production, replace the JSON persistence with a database (MongoDB, Postgres, etc.) and secure your Stripe secret.
+- Redirect URLs for Stripe checkout are restricted to the `FRONTEND_URL` origin for safer deployment.

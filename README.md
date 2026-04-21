@@ -32,6 +32,9 @@ cd Baby_Boo_Closet
 # Install frontend dependencies
 npm install
 
+# Create frontend env file
+cp src/.env.local.example .env.local
+
 # Start the Vite dev server (http://localhost:5173)
 npm run dev
 
@@ -48,6 +51,27 @@ npm install
 cp .env.example .env   # add STRIPE_SECRET_KEY before running
 npm run dev            # starts Express API on http://localhost:4000
 ```
+
+## Environment Variables
+
+Frontend (`.env.local` in project root):
+
+```bash
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_API_BASE_URL=http://localhost:4000
+VITE_FRONTEND_URL=http://localhost:5173
+```
+
+Backend (`server/.env`):
+
+```bash
+STRIPE_SECRET_KEY=sk_test_or_live_key
+PORT=4000
+FRONTEND_URL=http://localhost:5173
+```
+
+For production, set `VITE_API_BASE_URL` and `VITE_FRONTEND_URL` to your deployed URLs.
 
 📁 **Project Structure (excerpt)**
 

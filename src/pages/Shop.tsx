@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProductCard from "@/components/ProductCard";
 import { CartItem, parseCart } from "@/lib/cart";
+import { buildApiUrl } from "@/lib/env";
 
 interface Product {
   id: string;
@@ -67,7 +68,7 @@ const Shop = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/products");
+      const response = await fetch(buildApiUrl("/api/products"));
       const data = await response.json();
       setProducts(data);
     } catch (error) {

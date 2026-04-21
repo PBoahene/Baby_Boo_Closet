@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CartItem, parseCart, serializeCart, subtotal as subtotalCart } from "@/lib/cart";
+import { buildApiUrl, FRONTEND_URL } from "@/lib/env";
 
 const Cart = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -39,10 +40,14 @@ const Cart = () => {
     if (cart.length === 0) return;
 
     try {
-      const res = await fetch("http://localhost:4000/api/create-checkout-session", {
+      const res = await fetch(buildApiUrl("/api/create-checkout-session"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart, success_url: "http://localhost:5173/checkout/success?session_id={CHECKOUT_SESSION_ID}", cancel_url: "http://localhost:5173/cart" }),
+        body: JSON.stringify({
+          cart,
+          success_url: `${FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${FRONTEND_URL}/cart`,
+        }),
       });
       const data = await res.json();
       const url = data?.url;
