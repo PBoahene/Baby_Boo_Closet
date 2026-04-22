@@ -9,6 +9,7 @@ import Shop from "./pages/Shop";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
+import SchoolKids from "./pages/SchoolKids";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import Cart from "./pages/Cart";
@@ -16,6 +17,7 @@ import CartSummary from "./pages/CartSummary";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import WhatsAppQuickOrder from "./components/WhatsAppQuickOrder";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/about" element={<About />} />
+          <Route path="/school-kids" element={<SchoolKids />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/cart/summary" element={<CartSummary />} />
@@ -40,6 +43,7 @@ const App = () => {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <WhatsAppQuickOrder />
         <Footer />
       </BrowserRouter>
     </TooltipProvider>

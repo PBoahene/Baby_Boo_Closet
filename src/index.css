@@ -2,67 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-/* BABY-BOO CLOSET - Kids Wear Design System
-   Playful, trustworthy, and joyful colors for children's clothing
-   All colors MUST be HSL.
-*/
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
 @layer base {
   :root {
-    /* Base colors - soft and friendly */
-    --background: 220 15% 92%;
-    --foreground: 222 84% 4.9%;
+    --background: 228 21% 8%;
+    --foreground: 210 40% 96%;
 
-    /* Card and surface colors */
-    --card: 0 0% 100%;
-    --card-foreground: 222 84% 4.9%;
+    --card: 229 19% 12%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 4.9%;
+    --popover: 229 19% 12%;
+    --popover-foreground: 210 40% 96%;
 
-    /* Primary - Warm coral for trust and warmth */
-    --primary: 14 86% 58%;
+    --primary: 45 94% 61%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 14 86% 68%;
+    --primary-glow: 45 94% 68%;
 
-    /* Secondary - Soft sage green for nature and growth */
-    --secondary: 142 31% 85%;
-    --secondary-foreground: 142 31% 15%;
+    --secondary: 191 78% 56%;
+    --secondary-foreground: 224 35% 10%;
 
-    /* Muted - Light gray with warmth */
-    --muted: 25 20% 94%;
-    --muted-foreground: 25 8% 45%;
+    --muted: 228 14% 17%;
+    --muted-foreground: 220 18% 73%;
 
-    /* Accent - Playful sky blue */
-    --accent: 200 95% 70%;
+    --accent: 336 85% 64%;
     --accent-foreground: 0 0% 100%;
 
-  /* Kids-specific colors (softer pastels) */
-  --kids-pink: 330 80% 88%;
-  --kids-blue: 205 75% 88%;
-  --kids-yellow: 48 95% 85%;
-  --kids-purple: 265 65% 88%;
+    --kids-pink: 336 85% 64%;
+    --kids-blue: 196 91% 60%;
+    --kids-yellow: 45 94% 61%;
+    --kids-purple: 267 74% 68%;
 
-    /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Border and input */
-    --border: 25 20% 88%;
-    --input: 25 20% 88%;
-    --ring: 14 86% 58%;
+    --border: 227 16% 25%;
+    --input: 227 16% 25%;
+    --ring: 45 94% 61%;
 
-    /* Gradients */
-  --gradient-hero: linear-gradient(135deg, hsl(14 86% 58%), hsl(330 80% 88%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(25 20% 96%));
-    --gradient-accent: linear-gradient(120deg, hsl(200 95% 70%), hsl(270 70% 75%));
+    --gradient-hero: linear-gradient(125deg, hsl(45 94% 61%), hsl(336 85% 64%));
+    --gradient-card: linear-gradient(140deg, hsl(229 19% 12%), hsl(228 14% 17%));
+    --gradient-accent: linear-gradient(140deg, hsl(196 91% 60%), hsl(267 74% 68%));
 
-    /* Shadows */
-  --shadow-soft: 0 6px 24px -6px hsl(14 86% 58% / 0.08);
-    --shadow-card: 0 8px 30px -4px hsl(0 0% 0% / 0.08);
-    --shadow-glow: 0 0 40px hsl(14 86% 58% / 0.2);
+    --shadow-soft: 0 14px 40px -24px hsl(45 94% 61% / 0.35);
+    --shadow-card: 0 18px 40px -24px hsl(0 0% 0% / 0.7);
+    --shadow-glow: 0 22px 48px -24px hsl(336 85% 64% / 0.45);
 
-    /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
@@ -86,26 +71,26 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 224 35% 11%;
+    --foreground: 210 40% 96%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 224 31% 14%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 224 31% 14%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 210 66% 64%;
+    --primary-foreground: 225 30% 12%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 164 26% 24%;
+    --secondary-foreground: 160 30% 91%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 224 18% 22%;
+    --muted-foreground: 213 17% 71%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 225 20% 21%;
+    --accent-foreground: 210 40% 96%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -121,5 +106,43 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    background-image:
+      radial-gradient(circle at 14% 10%, hsl(var(--kids-yellow) / 0.18), transparent 28%),
+      radial-gradient(circle at 84% 12%, hsl(var(--kids-blue) / 0.18), transparent 26%),
+      radial-gradient(circle at 68% 85%, hsl(var(--kids-pink) / 0.18), transparent 30%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(229 22% 7%) 60%, hsl(229 24% 6%) 100%);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Outfit", sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  a {
+    @apply transition-colors;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
   }
 }

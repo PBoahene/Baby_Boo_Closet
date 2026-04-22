@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CartItem, parseCart, serializeCart } from "@/lib/cart";
+import { formatCurrency } from "@/lib/currency";
 
 interface ProductCardProps {
   id: string;
@@ -64,45 +65,42 @@ const ProductCard = ({
   }
 
   return (
-    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-card hover:-translate-y-1">
+    <Card className="group cursor-pointer overflow-hidden border-white/60 bg-white/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
       <CardContent className="p-0">
-        <div className="relative overflow-hidden rounded-t-lg">
+        <div className="relative overflow-hidden">
           <img 
             src={image} 
             alt={name}
-            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           
-          {/* Overlay badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {discount > 0 && (
-              <Badge variant="destructive">
+              <Badge variant="destructive" className="rounded-full px-2.5">
                 {discount}% OFF
               </Badge>
             )}
           </div>
 
-          {/* Heart icon */}
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background"
+            className="absolute right-3 top-3 bg-background/85 opacity-0 transition-opacity hover:bg-background group-hover:opacity-100"
           >
             <Heart className="h-4 w-4" />
           </Button>
         </div>
 
-        <div className="p-4">
-          <div className="flex justify-between items-start mb-2">
+        <div className="space-y-3 p-4">
+          <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-muted-foreground uppercase tracking-wide">{category}</p>
-              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary/85">{category}</p>
+              <h3 className="text-base font-semibold text-foreground transition-colors group-hover:text-primary">
                 {name}
               </h3>
             </div>
           </div>
 
-          {/* Color options */}
           {colors.length > 0 && (
             <div className="flex gap-1 mb-3">
               {colors.slice(0, 4).map((color, index) => (
@@ -120,7 +118,6 @@ const ProductCard = ({
             </div>
           )}
 
-          {/* Sizes */}
           {sizes.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-3">
               {sizes.map((size, index) => (
@@ -131,22 +128,26 @@ const ProductCard = ({
             </div>
           )}
 
-          {/* Price */}
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg font-bold text-primary">
-              ${price.toFixed(2)}
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold text-primary">
+              {formatCurrency(price)}
             </span>
             {originalPrice && (
               <span className="text-sm text-muted-foreground line-through">
-                ${originalPrice.toFixed(2)}
+                {formatCurrency(originalPrice)}
               </span>
             )}
           </div>
 
-          <div className="flex gap-2">
-            <Button onClick={addToCart} className="flex-1">
+          <div className="flex gap-2 pt-1">
+            <Button onClick={addToCart} className="h-10 flex-1 rounded-full">
               Add to Cart
             </Button>
+            {isCustomizable && (
+              <Button variant="outline" size="icon" className="h-10 w-10 rounded-full" aria-label="Customizable item">
+                <Palette className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>

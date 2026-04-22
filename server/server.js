@@ -119,7 +119,7 @@ app.post("/api/create-payment-intent", async (req, res) => {
   const Stripe = (await import("stripe")).default;
   const stripe = new Stripe(stripeSecret, { apiVersion: "2022-11-15" });
 
-  const { amount, currency = "usd", metadata = {} } = req.body;
+  const { amount, currency = "ghs", metadata = {} } = req.body;
   if (!amount) return res.status(400).json({ error: "Missing amount (in cents)" });
 
   try {
@@ -150,7 +150,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
   try {
     const line_items = cart.map((item) => ({
       price_data: {
-        currency: "usd",
+        currency: "ghs",
         product_data: {
           name: item.name,
         },

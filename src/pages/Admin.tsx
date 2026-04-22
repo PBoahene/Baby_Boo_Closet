@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Upload, Download, RefreshCw, ExternalLink, Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/config";
+import { formatCurrency } from "@/lib/currency";
 
 interface Product {
   id: string;
@@ -163,10 +164,10 @@ const Admin = () => {
                   <CardContent>
                     <div className="flex justify-between items-center mb-3">
                       <div>
-                        <span className="text-lg font-bold">${product.price}</span>
+                        <span className="text-lg font-bold">{formatCurrency(product.price)}</span>
                         {product.originalPrice && (
                           <span className="ml-2 text-sm text-muted-foreground line-through">
-                            ${product.originalPrice}
+                            {formatCurrency(product.originalPrice)}
                           </span>
                         )}
                       </div>
@@ -226,7 +227,7 @@ const Admin = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="price">Price ($)</Label>
+                    <Label htmlFor="price">Price (GH₵)</Label>
                     <Input
                       id="price"
                       type="number"
@@ -238,7 +239,7 @@ const Admin = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="originalPrice">Original Price ($)</Label>
+                    <Label htmlFor="originalPrice">Original Price (GH₵)</Label>
                     <Input
                       id="originalPrice"
                       type="number"

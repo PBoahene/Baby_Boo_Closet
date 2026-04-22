@@ -27,7 +27,7 @@ Endpoints
 - GET /api/products -> returns sample products from `server/data/products.json`
 - GET /api/products/:id -> single product
 - POST /api/orders -> save order payload to `server/data/orders.json` (expects JSON { order: { ... } })
-- POST /api/create-payment-intent -> create a Stripe PaymentIntent (expects { amount, currency?, metadata? })
+- POST /api/create-payment-intent -> create a Stripe PaymentIntent (expects { amount, currency?, metadata? }, defaults to GHS)
 
 Notes
 

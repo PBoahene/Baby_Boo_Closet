@@ -1,170 +1,94 @@
-import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Palette, Shirt, Upload } from "lucide-react";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, Gift, Package, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import heroImage from "@/assets/hero-kids.jpg";
 
 const HeroSection = () => {
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
-    <section className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-background via-muted/20 to-secondary/30">
-      <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Left Content */}
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <Badge className="bg-kids-yellow text-black flex items-center gap-2 w-fit">
-              <Sparkles className="h-4 w-4" />
-              New: Custom School Uniforms Available!
-            </Badge>
-            
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-              <span className="bg-gradient-hero bg-clip-text text-transparent">
-                Custom Kids Wear
-              </span>
-              <br />
-              <span className="text-foreground">
-                Made With Love
-              </span>
-            </h1>
-            
-            <p className="text-xl text-muted-foreground max-w-lg">
-              Design personalized clothing for your little ones. Add names, choose colors, 
-              and create unique pieces they'll love to wear. Perfect for schools and special occasions.
-            </p>
+    <section className="relative overflow-hidden py-12 md:py-16">
+      <div className="container mx-auto px-4">
+        <div className="grid items-center gap-10 rounded-3xl border border-white/10 bg-gradient-card p-6 shadow-card backdrop-blur md:p-10 lg:grid-cols-2">
+          <div className="space-y-7">
+            <Badge className="w-fit bg-accent text-accent-foreground">Trusted by parents and schools in Ghana</Badge>
+
+            <div className="space-y-4">
+              <h1 className="max-w-xl text-4xl font-bold leading-tight text-foreground md:text-6xl">
+                Modern kidswear that looks smart and lasts the school year.
+              </h1>
+              <p className="max-w-xl text-lg text-muted-foreground">
+                Shop premium everyday clothing, uniforms, and accessories designed for comfort, durability, and confidence.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Link to="/shop">
+                <Button size="lg" className="rounded-full px-7">Shop Collection</Button>
+              </Link>
+              <Link to="/about">
+                <Button variant="outline" size="lg" className="rounded-full px-7">Learn Our Story</Button>
+              </Link>
+            </div>
+
+            <div className="grid gap-3 text-sm text-foreground/90 sm:grid-cols-2">
+              <p className="flex items-center gap-2 rounded-lg bg-black/35 px-3 py-2">
+                <Truck className="h-4 w-4 text-primary" /> Nationwide delivery
+              </p>
+              <p className="flex items-center gap-2 rounded-lg bg-black/35 px-3 py-2">
+                <ShieldCheck className="h-4 w-4 text-primary" /> Safe card checkout
+              </p>
+              <p className="flex items-center gap-2 rounded-lg bg-black/35 px-3 py-2">
+                <Package className="h-4 w-4 text-primary" /> Bulk school orders
+              </p>
+              <p className="flex items-center gap-2 rounded-lg bg-black/35 px-3 py-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" /> Quality checked items
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="hero" size="lg" className="group">
-                  <Palette className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform" />
-                  Start Customizing
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Upload Your Reference Design</DialogTitle>
-                  <DialogDescription>
-                    Upload a sample image of the item you'd like us to create. We'll use it as a reference for your custom order.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="reference-image">Reference Image</Label>
-                    <div className="flex items-center justify-center w-full">
-                      <label
-                        htmlFor="reference-image"
-                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        {imagePreview ? (
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="w-full h-full object-contain rounded-lg"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
-                            <p className="mb-2 text-sm text-muted-foreground">
-                              <span className="font-semibold">Click to upload</span> or drag and drop
-                            </p>
-                            <p className="text-xs text-muted-foreground">PNG, JPG or JPEG (MAX. 5MB)</p>
-                          </div>
-                        )}
-                        <Input
-                          id="reference-image"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleImageUpload}
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="item-name">Item Name</Label>
-                    <Input id="item-name" placeholder="e.g., School Uniform, T-Shirt" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Additional Details</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Tell us about colors, sizes, quantities, or any special requirements..."
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="contact">Contact (Phone/Email)</Label>
-                    <Input id="contact" placeholder="Your phone number or email" />
-                  </div>
-
-                  <Button className="w-full" size="lg">
-                    Submit Request
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Button variant="outline" size="lg">
-              <Shirt className="h-5 w-5 mr-2" />
-              View School Uniforms
-            </Button>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex items-center gap-8 pt-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">10K+</div>
-              <div className="text-sm text-muted-foreground">Happy Families</div>
+          <div className="relative">
+            <img
+              src={heroImage}
+              alt="Children wearing colorful school-ready outfits"
+              className="h-[520px] w-full rounded-2xl object-cover shadow-soft"
+            />
+            <div className="absolute -bottom-5 left-5 rounded-xl bg-black/75 p-4 shadow-card">
+              <p className="text-xs uppercase tracking-wide text-white/80">Back to School Deals</p>
+              <p className="text-xl font-bold text-white">Up to 20% off school essentials</p>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">50+</div>
-              <div className="text-sm text-muted-foreground">Partner Schools</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">24hr</div>
-              <div className="text-sm text-muted-foreground">Fast Delivery</div>
+            <div className="absolute -right-4 top-5 rounded-full bg-gradient-accent px-4 py-2 text-sm font-semibold text-white shadow-glow">
+              New Arrival
             </div>
           </div>
         </div>
 
-        {/* Right Content - Hero Image */}
-        <div className="relative">
-          <div className="relative z-10">
-            <img 
-              src={heroImage} 
-              alt="Happy children wearing colorful custom clothing"
-              className="w-full h-[500px] object-cover rounded-2xl shadow-card"
-            />
-          </div>
-          
-          {/* Floating elements */}
-          <div className="absolute -top-4 -right-4 bg-kids-pink text-white p-4 rounded-xl shadow-glow animate-bounce">
-            <Sparkles className="h-6 w-6" />
-          </div>
-          <div className="absolute -bottom-4 -left-4 bg-kids-blue text-white p-4 rounded-xl shadow-glow animate-pulse">
-            <Palette className="h-6 w-6" />
-          </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <article className="rounded-2xl border border-primary/35 bg-black/55 p-4 transition-transform duration-300 hover:-translate-y-1">
+            <div className="mb-2 flex items-center gap-2 text-primary">
+              <Gift className="h-4 w-4" />
+              <span className="text-xs font-semibold uppercase tracking-wide">Promotional Banner</span>
+            </div>
+            <h3 className="text-lg font-semibold">Newborn Essentials</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Soft bodysuits, wraps, and comfort sets for infants aged 0-12 months.</p>
+          </article>
+
+          <article className="rounded-2xl border border-kids-blue/40 bg-black/55 p-4 transition-transform duration-300 hover:-translate-y-1">
+            <div className="mb-2 flex items-center gap-2 text-kids-blue">
+              <Sparkles className="h-4 w-4" />
+              <span className="text-xs font-semibold uppercase tracking-wide">Promotional Banner</span>
+            </div>
+            <h3 className="text-lg font-semibold">Back to School Deals</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Bundle uniforms, socks, and underwear at school-season prices.</p>
+          </article>
+
+          <article className="rounded-2xl border border-kids-pink/40 bg-black/55 p-4 transition-transform duration-300 hover:-translate-y-1">
+            <div className="mb-2 flex items-center gap-2 text-kids-pink">
+              <Package className="h-4 w-4" />
+              <span className="text-xs font-semibold uppercase tracking-wide">Featured Collection</span>
+            </div>
+            <h3 className="text-lg font-semibold">Everyday Underwear Packs</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Comfortable boys and girls essentials made for all-day wear.</p>
+          </article>
         </div>
       </div>
     </section>

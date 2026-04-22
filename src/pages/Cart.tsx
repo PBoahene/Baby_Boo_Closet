@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CartItem, parseCart, serializeCart, subtotal as subtotalCart } from "@/lib/cart";
 import { apiUrl, APP_BASE_URL } from "@/lib/config";
+import { formatCurrency } from "@/lib/currency";
 
 const Cart = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -96,7 +97,7 @@ const Cart = () => {
                       {item.size && <div className="text-sm text-muted-foreground">Size: {item.size}</div>}
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">${(item.price || 0).toFixed(2)}</div>
+                      <div className="font-medium">{formatCurrency(item.price || 0)}</div>
                       <div className="text-sm text-muted-foreground">each</div>
                     </div>
                   </div>
@@ -118,7 +119,7 @@ const Cart = () => {
           <aside className="p-6 rounded-lg bg-gradient-to-b from-kids-pink/10 to-kids-blue/5 border">
             <div className="mb-6">
               <div className="text-sm text-muted-foreground">Subtotal</div>
-              <div className="text-2xl font-bold">${subtotalCart(cart).toFixed(2)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(subtotalCart(cart))}</div>
             </div>
 
             <div className="mb-4 text-sm text-muted-foreground">

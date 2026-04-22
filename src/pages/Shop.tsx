@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Search, Filter, ChevronDown, Grid, List } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useEffect, useMemo, useState } from "react";
+import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import ProductCard from "@/components/ProductCard";
-import { CartItem, parseCart } from "@/lib/cart";
 import { apiUrl } from "@/lib/config";
 
 interface Product {
@@ -24,92 +23,78 @@ interface FilterState {
   categories: string[];
   priceRange: [number, number];
   sizes: string[];
-  colors: string[];
-  ages: string[];
 }
+
+const categories = [
+  "School Uniforms",
+  "Casual Wear",
+  "Dresses",
+  "Jackets & Coats",
+  "Sweaters",
+  "Underwear",
+];
+
+const sizes = ["XS", "S", "M", "L", "XL"];
 
 const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("relevance");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [showFilters, setShowFilters] = useState(false);
-  
+
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
-    priceRange: [0, 100],
+    priceRange: [0, 500],
     sizes: [],
-    colors: [],
-    ages: []
   });
 
-  const categories = [
-    "School Uniforms",
-    "Casual Wear", 
-    "Dresses",
-    "Jackets & Coats",
-    "Sweaters",
-    "Underwear"
-  ];
-
-  const sizes = ["XS", "S", "M", "L", "XL"];
-  const colors = ["Blue", "White", "Red", "Green", "Pink", "Purple", "Yellow", "Black"];
-  const ages = ["0-6 months", "6-12 months", "1-2 years", "2-3 years", "3-4 years", "4-5 years", "5-6 years", "6-8 years", "8-10 years", "10-12 years"];
-
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(apiUrl("/api/products"));
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [products, searchQuery, filters, sortBy]);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch(apiUrl("/api/products"));
-      const data = await response.json();
-      setProducts(data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = () => {
+  const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(q) ||
+          product.category.toLowerCase().includes(q),
       );
     }
 
-    // Category filter
     if (filters.categories.length > 0) {
-      filtered = filtered.filter(product =>
-        filters.categories.includes(product.category)
+      filtered = filtered.filter((product) =>
+        filters.categories.includes(product.category),
       );
     }
 
-    // Price filter
-    filtered = filtered.filter(product =>
-      product.price >= filters.priceRange[0] && 
-      product.price <= filters.priceRange[1]
+    filtered = filtered.filter(
+      (product) =>
+        product.price >= filters.priceRange[0] &&
+        product.price <= filters.priceRange[1],
     );
 
-    // Size filter
     if (filters.sizes.length > 0) {
-      filtered = filtered.filter(product =>
-        product.sizes?.some(size => filters.sizes.includes(size))
+      filtered = filtered.filter((product) =>
+        product.sizes?.some((size) => filters.sizes.includes(size)),
       );
     }
 
-    // Sort
     switch (sortBy) {
       case "price-low":
         filtered.sort((a, b) => a.price - b.price);
@@ -124,150 +109,121 @@ const Shop = () => {
         break;
     }
 
-    setFilteredProducts(filtered);
-  };
+    return filtered;
+  }, [filters, products, searchQuery, sortBy]);
 
   const toggleCategoryFilter = (category: string) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       categories: prev.categories.includes(category)
-        ? prev.categories.filter(c => c !== category)
-        : [...prev.categories, category]
+        ? prev.categories.filter((item) => item !== category)
+        : [...prev.categories, category],
     }));
   };
 
   const toggleSizeFilter = (size: string) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       sizes: prev.sizes.includes(size)
-        ? prev.sizes.filter(s => s !== size)
-        : [...prev.sizes, size]
+        ? prev.sizes.filter((item) => item !== size)
+        : [...prev.sizes, size],
     }));
   };
 
-  const toggleAgeFilter = (age: string) => {
-    setFilters(prev => ({
-      ...prev,
-      ages: prev.ages.includes(age)
-        ? prev.ages.filter(a => a !== age)
-        : [...prev.ages, age]
-    }));
+  const clearFilters = () => {
+    setSearchQuery("");
+    setFilters({ categories: [], priceRange: [0, 500], sizes: [] });
+    setSortBy("relevance");
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-gradient-hero text-white py-8">
+    <main className="min-h-screen">
+      <section className="pb-8 pt-10 md:pt-14">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Buy Affordable and High Quality Baby Clothes from BABY-BOO CLOSET
-          </h1>
-          <p className="text-white/90 mb-4">
-            Showing {filteredProducts.length} out of {products.length} products
-          </p>
-          <p className="text-white/80 text-sm max-w-4xl">
-            Finding the perfect mixture of comfort, style and affordability in baby dress can be challenging. 
-            At BABY-BOO CLOSET, we bring you a handpicked collection of baby dresses that are not only stylish but also crafted from baby-safe fabrics.
-            Whether you are looking for everyday baby clothes, party-ready wear or baby winter clothes, BABY-BOO CLOSET has everything your little one needs.
-          </p>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-6">
-        {/* Search and Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Try Saree, Kurti or Search by Product Code"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+          <div className="rounded-3xl border border-white/60 bg-white/85 p-6 shadow-soft md:p-10">
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Shop Collection</p>
+            <h1 className="mt-2 text-3xl font-bold md:text-5xl">Find everyday essentials and signature school styles</h1>
+            <p className="mt-3 max-w-3xl text-muted-foreground">
+              Browse high-quality pieces built for comfort, movement, and long-lasting wear. Use filters to quickly narrow by category, size, and budget.
+            </p>
           </div>
-          
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2"
-            >
-              <Filter className="h-4 w-4" />
-              Filters
-            </Button>
-            
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background"
-            >
-              <option value="relevance">Sort by: Relevance</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="name">Name: A to Z</option>
-            </select>
+        </div>
+      </section>
 
-            <div className="flex border rounded-md overflow-hidden">
+      <section className="pb-16">
+        <div className="container mx-auto px-4">
+          <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-white/60 bg-white/85 p-4 shadow-soft md:flex-row md:items-center md:justify-between">
+            <div className="relative w-full md:max-w-xl">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-11 rounded-full border-border/80 bg-white pl-10"
+                placeholder="Search by product name or category"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
               <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
+                variant="outline"
+                className="rounded-full lg:hidden"
+                onClick={() => setShowFilters((prev) => !prev)}
               >
-                <Grid className="h-4 w-4" />
+                <Filter className="h-4 w-4" /> Filters
               </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-              >
-                <List className="h-4 w-4" />
-              </Button>
+
+              <div className="inline-flex h-11 items-center rounded-full border border-border/80 bg-white px-4 text-sm">
+                <SlidersHorizontal className="mr-2 h-4 w-4 text-muted-foreground" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-transparent outline-none"
+                >
+                  <option value="relevance">Sort: Relevance</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="name">Name: A to Z</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex gap-6">
-          {/* Filters Sidebar */}
-          {showFilters && (
-            <aside className="w-64 space-y-6">
-              <div className="bg-card p-4 rounded-lg border">
-                <h3 className="font-semibold mb-3">FILTERS</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {products.length}+ Products
-                </p>
+          <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+            <aside
+              className={`${showFilters ? "block" : "hidden"} rounded-2xl border border-white/60 bg-white/90 p-5 shadow-soft lg:block`}
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Refine Results</h2>
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2 text-xs">
+                  Reset
+                </Button>
+              </div>
 
-                {/* Category Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3 flex items-center justify-between">
-                    Category
-                    <ChevronDown className="h-4 w-4" />
-                  </h4>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="mb-3 text-sm font-semibold">Categories</h3>
                   <div className="space-y-2">
                     {categories.map((category) => (
-                      <div key={category} className="flex items-center space-x-2">
+                      <label key={category} className="flex cursor-pointer items-center gap-2 text-sm">
                         <Checkbox
-                          id={category}
                           checked={filters.categories.includes(category)}
                           onCheckedChange={() => toggleCategoryFilter(category)}
                         />
-                        <label htmlFor={category} className="text-sm">
-                          {category}
-                        </label>
-                      </div>
+                        {category}
+                      </label>
                     ))}
                   </div>
                 </div>
 
-                {/* Size Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Size</h4>
+                <div>
+                  <h3 className="mb-3 text-sm font-semibold">Available sizes</h3>
                   <div className="flex flex-wrap gap-2">
                     {sizes.map((size) => (
                       <Badge
                         key={size}
+                        onClick={() => toggleSizeFilter(size)}
                         variant={filters.sizes.includes(size) ? "default" : "outline"}
                         className="cursor-pointer"
-                        onClick={() => toggleSizeFilter(size)}
                       >
                         {size}
                       </Badge>
@@ -275,107 +231,76 @@ const Shop = () => {
                   </div>
                 </div>
 
-                {/* Age Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3 flex items-center justify-between cursor-pointer" onClick={() => {
-                    const element = document.getElementById('age-filter-content');
-                    element?.classList.toggle('hidden');
-                  }}>
-                    Age
-                    <ChevronDown className="h-4 w-4" />
-                  </h4>
-                  <div id="age-filter-content" className="space-y-2">
-                    {ages.map((age) => (
-                      <div key={age} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={age}
-                          checked={filters.ages.includes(age)}
-                          onCheckedChange={() => toggleAgeFilter(age)}
-                        />
-                        <label htmlFor={age} className="text-sm">
-                          {age}
-                        </label>
-                      </div>
-                    ))}
+                <div>
+                  <h3 className="mb-3 text-sm font-semibold">Price range (GHc)</h3>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      className="h-9"
+                      value={filters.priceRange[0]}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          priceRange: [Number(e.target.value), prev.priceRange[1]],
+                        }))
+                      }
+                    />
+                    <span className="text-sm text-muted-foreground">to</span>
+                    <Input
+                      type="number"
+                      className="h-9"
+                      value={filters.priceRange[1]}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          priceRange: [prev.priceRange[0], Number(e.target.value)],
+                        }))
+                      }
+                    />
                   </div>
                 </div>
 
-                {/* Price Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Price Range</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        type="number"
-                        placeholder="Min"
-                        value={filters.priceRange[0]}
-                        onChange={(e) => setFilters(prev => ({
-                          ...prev,
-                          priceRange: [Number(e.target.value), prev.priceRange[1]]
-                        }))}
-                        className="w-20"
-                      />
-                      <span>-</span>
-                      <Input
-                        type="number"
-                        placeholder="Max"
-                        value={filters.priceRange[1]}
-                        onChange={(e) => setFilters(prev => ({
-                          ...prev,
-                          priceRange: [prev.priceRange[0], Number(e.target.value)]
-                        }))}
-                        className="w-20"
-                      />
-                    </div>
-                  </div>
-                </div>
+                <Button
+                  variant="outline"
+                  className="w-full rounded-full lg:hidden"
+                  onClick={() => setShowFilters(false)}
+                >
+                  <X className="h-4 w-4" /> Close filters
+                </Button>
               </div>
             </aside>
-          )}
 
-          {/* Products Grid */}
-          <main className="flex-1">
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="text-lg">Loading products...</div>
+            <div>
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Showing {filteredProducts.length} of {products.length} products
+                </p>
               </div>
-            ) : (
-              <>
-                <div className={
-                  viewMode === "grid" 
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                    : "space-y-4"
-                }>
+
+              {loading ? (
+                <div className="rounded-2xl border border-white/70 bg-white/85 p-14 text-center">
+                  <p className="text-lg font-medium">Loading products...</p>
+                </div>
+              ) : filteredProducts.length === 0 ? (
+                <div className="rounded-2xl border border-white/70 bg-white/85 p-14 text-center">
+                  <p className="text-lg font-medium">No products match your filters.</p>
+                  <p className="mt-2 text-muted-foreground">Try broadening your search or reset filters.</p>
+                  <Button onClick={clearFilters} className="mt-5 rounded-full">
+                    Clear filters
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {filteredProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />
                   ))}
                 </div>
-
-                {filteredProducts.length === 0 && (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground mb-4">No products found matching your criteria.</p>
-                    <Button
-                      onClick={() => {
-                        setSearchQuery("");
-                        setFilters({
-                          categories: [],
-                          priceRange: [0, 500],
-                          sizes: [],
-                          colors: [],
-                          ages: []
-                        });
-                      }}
-                    >
-                      Clear all filters
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
-          </main>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

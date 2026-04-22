@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 const FeaturedProducts = () => {
   const products = [
@@ -57,58 +58,57 @@ const FeaturedProducts = () => {
   ];
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-16">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Featured <span className="bg-gradient-hero bg-clip-text text-transparent">Products</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Quality kids clothing designed for comfort, style, and durability
-          </p>
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Featured Picks</p>
+            <h2 className="mt-2 text-3xl font-bold md:text-4xl">Customer favorites this month</h2>
+            <p className="mt-2 max-w-2xl text-muted-foreground">
+              Curated pieces that combine comfort, quality fabric, and a polished look for school and weekend wear.
+            </p>
+          </div>
+          <Link to="/shop">
+            <Button variant="outline" className="rounded-full">
+              Browse all products <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
-            <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={product.id} className="group overflow-hidden border-white/10 bg-card/90 shadow-soft">
               <div className="relative aspect-square overflow-hidden">
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 {product.featured && (
-                  <Badge className="absolute top-3 right-3 bg-kids-yellow text-black">
-                    Featured
+                  <Badge className="absolute left-3 top-3 bg-gradient-hero text-white">
+                    Staff Pick
                   </Badge>
                 )}
               </div>
               <CardContent className="p-4">
-                <div className="mb-2">
-                  <Badge variant="outline" className="text-xs">
+                <div className="mb-3 flex items-center justify-between">
+                  <Badge variant="outline" className="border-primary/35 text-xs text-primary">
                     {product.category}
                   </Badge>
+                  <span className="text-xs font-medium text-muted-foreground">In Stock</span>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
+                <h3 className="mb-3 text-lg font-semibold">{product.name}</h3>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">
+                  <span className="text-xl font-bold text-primary">
                     GH₵{product.price.toFixed(2)}
                   </span>
-                  <Button size="sm" variant="outline">
-                    Add to Cart
+                  <Button size="sm" className="rounded-full">
+                    View Item
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
-        </div>
-        
-        <div className="text-center">
-          <Link to="/shop">
-            <Button size="lg" className="bg-gradient-hero">
-              View All Products
-            </Button>
-          </Link>
         </div>
       </div>
     </section>

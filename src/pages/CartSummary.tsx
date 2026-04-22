@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, ArrowLeft, Truck, Shield, CreditCard } from "lucide-react";
 import { CartItem, parseCart, subtotal as calculateSubtotal } from "@/lib/cart";
 import { apiUrl, APP_BASE_URL } from "@/lib/config";
+import { formatCurrency } from "@/lib/currency";
 
 const CartSummary = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -19,7 +20,7 @@ const CartSummary = () => {
   }, []);
 
   const subtotal = calculateSubtotal(cart);
-  const shipping = subtotal > 50 ? 0 : 5.99;
+  const shipping = subtotal > 300 ? 0 : 35;
   const tax = subtotal * 0.08; // 8% tax
   const total = subtotal + shipping + tax - discount;
 
@@ -99,8 +100,8 @@ const CartSummary = () => {
                       <p className="text-sm text-muted-foreground">Qty: {item.qty}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${(item.price * item.qty).toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
+                      <p className="font-medium">{formatCurrency(item.price * item.qty)}</p>
+                      <p className="text-sm text-muted-foreground">{formatCurrency(item.price)} each</p>
                     </div>
                   </div>
                 ))}
@@ -127,7 +128,7 @@ const CartSummary = () => {
                 </div>
                 {discount > 0 && (
                   <div className="mt-2 text-sm text-green-600">
-                    Promo code applied! You saved ${discount.toFixed(2)}
+                    Promo code applied! You saved {formatCurrency(discount)}
                   </div>
                 )}
                 <div className="mt-2 text-xs text-muted-foreground">
@@ -170,20 +171,20 @@ const CartSummary = () => {
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatCurrency(subtotal)}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className={shipping === 0 ? "text-green-600" : ""}>
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : formatCurrency(shipping)}
                   </span>
                 </div>
                 
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
-                    <span>-${discount.toFixed(2)}</span>
+                    <span>-{formatCurrency(discount)}</span>
                   </div>
                 )}
                 
@@ -191,7 +192,7 @@ const CartSummary = () => {
                 
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{formatCurrency(total)}</span>
                 </div>
           
                 <Button onClick={proceedToCheckout} className="w-full mt-4" size="lg">
@@ -217,7 +218,7 @@ const CartSummary = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Truck className="h-4 w-4 text-blue-600" />
-                      <span>Free shipping on orders $50+</span>
+                      <span>Free shipping on orders GH₵300+</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className="h-4 w-4" />
