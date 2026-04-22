@@ -32,8 +32,8 @@ cd Baby_Boo_Closet
 # Install frontend dependencies
 npm install
 
-# Create frontend env file
-cp src/.env.local.example .env.local
+# Configure frontend environment
+cp .env.example .env
 
 # Start the Vite dev server (http://localhost:5173)
 npm run dev
@@ -48,30 +48,22 @@ npm run build
 # Backend API (Stripe checkout + product data)
 cd server
 npm install
-cp .env.example .env   # add STRIPE_SECRET_KEY before running
+cp .env.example .env   # add STRIPE_SECRET_KEY (and optional FRONTEND_URL)
 npm run dev            # starts Express API on http://localhost:4000
 ```
 
 ## Environment Variables
 
-Frontend (`.env.local` in project root):
+Frontend (`.env`)
 
-```bash
-VITE_SUPABASE_URL=your-supabase-url
-VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_API_BASE_URL=http://localhost:4000
-VITE_FRONTEND_URL=http://localhost:5173
-```
+- `VITE_API_BASE_URL` - API server base URL (default: `http://localhost:4000`)
+- `VITE_APP_BASE_URL` - public frontend base URL for Stripe redirects (default: current browser origin)
 
-Backend (`server/.env`):
+Backend (`server/.env`)
 
-```bash
-STRIPE_SECRET_KEY=sk_test_or_live_key
-PORT=4000
-FRONTEND_URL=http://localhost:5173
-```
-
-For production, set `VITE_API_BASE_URL` and `VITE_FRONTEND_URL` to your deployed URLs.
+- `STRIPE_SECRET_KEY` - Stripe secret key
+- `PORT` - server port (default: `4000`)
+- `FRONTEND_URL` - frontend base URL for fallback checkout redirects (default: `http://localhost:5173`)
 
 📁 **Project Structure (excerpt)**
 
@@ -111,19 +103,19 @@ Login/Register	User authentication
 Admin	Store management dashboard
 
 ###🔧 Tech Stack
-Frontend: React 18.2.0
+Frontend: React + TypeScript
 
-Routing: React Router DOM 6.3.0
+Routing: React Router DOM
 
-State Management: React Context API
+State Management: React Hooks + TanStack Query
 
-Storage: localStorage
+Storage: localStorage + Supabase
 
-HTTP Client: Axios
+HTTP Client: Fetch API + Supabase JS
 
-Styling: CSS3 + Responsive Design
+Styling: Tailwind CSS + shadcn/ui
 
-Build Tool: Create React App
+Build Tool: Vite
 
 ###📱 Responsive Design
 Fully optimized for:

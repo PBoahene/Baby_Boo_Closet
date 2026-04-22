@@ -4,7 +4,7 @@ import "./index.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
-  console.error("Root element not found!");
-} else {
-  createRoot(rootElement).render(<App />);
+  throw new Error("Root element not found");
 }
+
+createRoot(rootElement).render(<App />);

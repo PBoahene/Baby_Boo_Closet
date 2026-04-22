@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, ArrowLeft, Truck, Shield, CreditCard } from "lucide-react";
 import { CartItem, parseCart, subtotal as calculateSubtotal } from "@/lib/cart";
-import { buildApiUrl, FRONTEND_URL } from "@/lib/env";
+import { apiUrl, APP_BASE_URL } from "@/lib/config";
 
 const CartSummary = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -35,13 +35,13 @@ const CartSummary = () => {
 
   const proceedToCheckout = async () => {
     try {
-      const res = await fetch(buildApiUrl("/api/create-checkout-session"), {
+      const res = await fetch(apiUrl("/api/create-checkout-session"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           cart, 
-          success_url: `${FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${FRONTEND_URL}/cart/summary`
+          success_url: `${APP_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`, 
+          cancel_url: `${APP_BASE_URL}/cart/summary` 
         }),
       });
       const data = await res.json();

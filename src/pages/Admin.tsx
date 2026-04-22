@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Upload, Download, RefreshCw, ExternalLink, Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { buildApiUrl } from "@/lib/env";
+import { apiUrl } from "@/lib/config";
 
 interface Product {
   id: string;
@@ -45,7 +45,7 @@ const Admin = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(buildApiUrl("/api/products"));
+      const response = await fetch(apiUrl("/api/products"));
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -88,7 +88,7 @@ const Admin = () => {
     }
 
     try {
-      const response = await fetch(buildApiUrl("/api/admin/products"), {
+      const response = await fetch(apiUrl("/api/admin/products"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProduct)
