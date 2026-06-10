@@ -7,9 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirm, setShowRegConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -30,59 +33,42 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate login API call
-    setTimeout(() => {
-      // Mock successful login
-      localStorage.setItem("user", JSON.stringify({
-        id: "1",
-        name: "John Doe",
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
         email: loginForm.email,
-        role: loginForm.email.includes("admin") ? "admin" : "customer"
-      }));
-
-      toast({
-        title: "Login Successful",
-        description: "Welcome back to BABY-BOO CLOSET!"
+        password: loginForm.password,
       });
-
-      setIsLoading(false);
+      if (error) throw error;
+      toast({ title: "Login Successful", description: "Welcome back to BABY-BOO CLOSET!" });
       navigate("/");
-    }, 1500);
+    } catch (err: any) {
+      toast({ title: "Login Failed", description: err.message, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (registerForm.password !== registerForm.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
       return;
     }
-
     setIsLoading(true);
-
-    // Simulate register API call
-    setTimeout(() => {
-      localStorage.setItem("user", JSON.stringify({
-        id: Math.random().toString(),
-        name: registerForm.name,
+    try {
+      const { error } = await supabase.auth.signUp({
         email: registerForm.email,
-        phone: registerForm.phone,
-        role: "customer"
-      }));
-
-      toast({
-        title: "Registration Successful",
-        description: "Welcome to BABY-BOO CLOSET!"
+        password: registerForm.password,
+        options: { data: { name: registerForm.name, phone: registerForm.phone } },
       });
-
-      setIsLoading(false);
+      if (error) throw error;
+      toast({ title: "Registration Successful", description: "Check your email to confirm your account." });
       navigate("/");
-    }, 1500);
+    } catch (err: any) {
+      toast({ title: "Registration Failed", description: err.message, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -145,12 +131,6 @@ const Login = () => {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot password?
-                  </Link>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
@@ -216,13 +196,22 @@ const Login = () => {
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
                       id="register-password"
-                      type="password"
+                      type={showRegPassword ? "text" : "password"}
                       placeholder="Create a password"
-                      className="pl-10"
+                      className="pl-10 pr-10"
                       value={registerForm.password}
                       onChange={(e) => setRegisterForm(prev => ({ ...prev, password: e.target.value }))}
                       required
                     />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowRegPassword(!showRegPassword)}
+                    >
+                      {showRegPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
                   </div>
                 </div>
 
@@ -232,13 +221,22 @@ const Login = () => {
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
                       id="confirm-password"
-                      type="password"
+                      type={showRegConfirm ? "text" : "password"}
                       placeholder="Confirm your password"
-                      className="pl-10"
+                      className="pl-10 pr-10"
                       value={registerForm.confirmPassword}
                       onChange={(e) => setRegisterForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       required
                     />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowRegConfirm(!showRegConfirm)}
+                    >
+                      {showRegConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
                   </div>
                 </div>
 

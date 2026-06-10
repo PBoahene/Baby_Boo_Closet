@@ -1,6 +1,5 @@
 import express from "express";
-import fs from "fs";
-import path from "path";
+import { createClient } from "@supabase/supabase-js";
 import cors from "cors";
 
 const app = express();
@@ -8,140 +7,132 @@ app.use(cors());
 app.use(express.json());
 const FRONTEND_URL = "http://localhost:5173";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
-const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
+const SUPABASE_URL = "https://mmhaxqcklycbkjihvngo.supabase.co";
+const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1taGF4cWNrbHljYmtqaWh2bmdvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTA0MTAwMCwiZXhwIjoyMDk2NjE3MDAwfQ.RJ7s__1iahGVUr_raYRGiqI_bgWHobfDHoOB0NIyGCg";
 
-// Helper to read JSON
-function readJson(filePath) {
-  try {
-    const raw = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(raw);
-  } catch (err) {
-    return null;
-  }
-}
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// Helper to write JSON
-function writeJson(filePath, data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-}
-
-app.get("/api/products", (req, res) => {
-  const products = readJson(PRODUCTS_FILE) || [];
-  res.json(products);
+// Products
+app.get("/api/products", async (req, res) => {
+  const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  const mapped = data.map((p) => ({
+    id: p.id,
+    name: p.name,
+    price: (p.price_cents || 0) / 100,
+    originalPrice: undefined,
+    image: p.images?.[0] || "",
+    category: p.category || "",
+    isCustomizable: false,
+    colors: [],
+    sizes: [],
+  }));
+  res.json(mapped);
 });
 
-app.get("/api/products/:id", (req, res) => {
-  const products = readJson(PRODUCTS_FILE) || [];
-  const p = products.find((x) => x.id === req.params.id);
-  if (!p) return res.status(404).json({ error: "Product not found" });
-  res.json(p);
+app.get("/api/products/:id", async (req, res) => {
+  const { data, error } = await supabase.from("products").select("*").eq("id", req.params.id).single();
+  if (error || !data) return res.status(404).json({ error: "Product not found" });
+  res.json(data);
 });
 
-// Create order - stores the order in orders.json
-app.post("/api/orders", (req, res) => {
+app.get("/api/featured", async (req, res) => {
+  const { data, error } = await supabase.from("products").select("*").eq("featured", true);
+  if (error) return res.status(500).json({ error: error.message });
+  const mapped = (data || []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    price: (p.price_cents || 0) / 100,
+    image: p.images?.[0] || "",
+    category: p.category || "",
+  }));
+  res.json(mapped);
+});
+
+// Orders
+app.post("/api/orders", async (req, res) => {
   const { order } = req.body;
   if (!order) return res.status(400).json({ error: "Missing order object" });
-
-  const orders = readJson(ORDERS_FILE) || [];
-  const createdAt = new Date().toISOString();
-  const id = `${Date.now()}`;
-  const newOrder = { id, createdAt, ...order };
-  orders.push(newOrder);
-  writeJson(ORDERS_FILE, orders);
-
-  res.json({ ok: true, order: newOrder });
+  const { data, error } = await supabase.from("orders").insert({
+    user_id: order.user_id || null,
+    status: "PENDING",
+    total_cents: Math.round((order.total || 0) * 100),
+  }).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  if (order.items?.length) {
+    const items = order.items.map((item) => ({
+      order_id: data.id,
+      product_id: item.product_id,
+      quantity: item.qty || 1,
+      unit_price_cents: Math.round((item.price || 0) * 100),
+    }));
+    await supabase.from("order_items").insert(items);
+  }
+  res.json({ ok: true, order: data });
 });
 
-app.get("/api/orders", (req, res) => {
-  const orders = readJson(ORDERS_FILE) || [];
-  res.json(orders);
+app.get("/api/orders", async (req, res) => {
+  const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
-app.get("/api/admin/stats", (req, res) => {
-  const products = readJson(PRODUCTS_FILE) || [];
-  const orders = readJson(ORDERS_FILE) || [];
-
-  const totalProducts = products.length;
-  const totalOrders = orders.length;
-  const revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const customers = new Set(orders.map((o) => o.email).filter(Boolean)).size;
-
-  res.json({
-    totalProducts,
-    totalOrders,
-    revenue,
-    customers,
-  });
+// Admin: stats
+app.get("/api/admin/stats", async (req, res) => {
+  const { count: totalProducts } = await supabase.from("products").select("*", { count: "exact", head: true });
+  const { count: totalOrders } = await supabase.from("orders").select("*", { count: "exact", head: true });
+  const { data: orders } = await supabase.from("orders").select("total_cents");
+  const revenue = (orders || []).reduce((sum, o) => sum + (o.total_cents || 0), 0) / 100;
+  res.json({ totalProducts: totalProducts || 0, totalOrders: totalOrders || 0, revenue, customers: 0 });
 });
 
-// Admin: Add single product
-app.post("/api/admin/products", (req, res) => {
+// Admin: add product
+app.post("/api/admin/products", async (req, res) => {
   const product = req.body;
-  if (!product.name || !product.price) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  const products = readJson(PRODUCTS_FILE) || [];
-  const newProduct = {
-    id: `${Date.now()}`,
-    ...product,
-    price: parseFloat(product.price),
-    originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : undefined
-  };
-  
-  products.push(newProduct);
-  writeJson(PRODUCTS_FILE, products);
-
-  res.json({ ok: true, product: newProduct });
+  if (!product.name || !product.price) return res.status(400).json({ error: "Missing required fields" });
+  const { data, error } = await supabase.from("products").insert({
+    name: product.name,
+    sku: product.sku || `SKU-${Date.now()}`,
+    price_cents: Math.round(parseFloat(product.price) * 100),
+    category: product.category || null,
+    stock: product.stock ?? 100,
+    images: product.image ? [product.image] : [],
+  }).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true, product: data });
 });
 
-// Admin: Update product
-app.put("/api/admin/products/:id", (req, res) => {
+// Admin: update product
+app.put("/api/admin/products/:id", async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
-  
-  const products = readJson(PRODUCTS_FILE) || [];
-  const index = products.findIndex(p => p.id === id);
-  
-  if (index === -1) {
-    return res.status(404).json({ error: "Product not found" });
-  }
-  
-  products[index] = { ...products[index], ...updates };
-  writeJson(PRODUCTS_FILE, products);
-  
-  res.json({ ok: true, product: products[index] });
+  const updates = {};
+  if (req.body.name !== undefined) updates.name = req.body.name;
+  if (req.body.price !== undefined) updates.price_cents = Math.round(parseFloat(req.body.price) * 100);
+  if (req.body.category !== undefined) updates.category = req.body.category;
+  if (req.body.stock !== undefined) updates.stock = req.body.stock;
+  if (req.body.image !== undefined) updates.images = req.body.image ? [req.body.image] : [];
+  const { data, error } = await supabase.from("products").update(updates).eq("id", id).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: "Product not found" });
+  res.json({ ok: true, product: data });
 });
 
-// Admin: Delete product
-app.delete("/api/admin/products/:id", (req, res) => {
+// Admin: delete product
+app.delete("/api/admin/products/:id", async (req, res) => {
   const { id } = req.params;
-  
-  const products = readJson(PRODUCTS_FILE) || [];
-  const filtered = products.filter(p => p.id !== id);
-  
-  if (filtered.length === products.length) {
-    return res.status(404).json({ error: "Product not found" });
-  }
-  
-  writeJson(PRODUCTS_FILE, filtered);
+  const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true, message: "Product deleted" });
 });
 
-app.get("/api/featured", (req, res) => {
-  const products = readJson(PRODUCTS_FILE) || [];
-  const featuredIds = readJson(path.join(DATA_DIR, "featured-ids.json")) || [];
-  const featured = products.filter((p) => featuredIds.includes(p.id));
-  res.json(featured);
-});
-
-// Admin: Update featured product IDs
-app.put("/api/admin/featured", (req, res) => {
+// Admin: update featured
+app.put("/api/admin/featured", async (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids)) return res.status(400).json({ error: "ids must be an array" });
-  writeJson(path.join(DATA_DIR, "featured-ids.json"), ids);
+  await supabase.from("products").update({ featured: false }).neq("id", "none");
+  if (ids.length > 0) {
+    await supabase.from("products").update({ featured: true }).in("id", ids);
+  }
   res.json({ ok: true, ids });
 });
 
@@ -149,20 +140,12 @@ app.put("/api/admin/featured", (req, res) => {
 app.post("/api/create-payment-intent", async (req, res) => {
   const stripeSecret = process.env.STRIPE_SECRET_KEY;
   if (!stripeSecret) return res.status(500).json({ error: "Stripe secret key not configured" });
-
   const Stripe = (await import("stripe")).default;
   const stripe = new Stripe(stripeSecret, { apiVersion: "2022-11-15" });
-
   const { amount, currency = "ghs", metadata = {} } = req.body;
   if (!amount) return res.status(400).json({ error: "Missing amount (in cents)" });
-
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency,
-      metadata,
-    });
-
+    const paymentIntent = await stripe.paymentIntents.create({ amount, currency, metadata });
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     console.error(err);
@@ -170,29 +153,23 @@ app.post("/api/create-payment-intent", async (req, res) => {
   }
 });
 
-// Create Stripe Checkout Session
+// Stripe Checkout Session
 app.post("/api/create-checkout-session", async (req, res) => {
   const stripeSecret = process.env.STRIPE_SECRET_KEY;
   if (!stripeSecret) return res.status(500).json({ error: "Stripe secret key not configured" });
-
   const Stripe = (await import("stripe")).default;
   const stripe = new Stripe(stripeSecret, { apiVersion: "2022-11-15" });
-
   const { cart, success_url, cancel_url } = req.body;
   if (!cart || !Array.isArray(cart) || cart.length === 0) return res.status(400).json({ error: "Cart is empty" });
-
   try {
     const line_items = cart.map((item) => ({
       price_data: {
         currency: "ghs",
-        product_data: {
-          name: item.name,
-        },
+        product_data: { name: item.name },
         unit_amount: Math.round((item.price || 0) * 100),
       },
       quantity: item.qty || 1,
     }));
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items,
@@ -200,7 +177,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
       success_url: success_url || `${FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancel_url || `${FRONTEND_URL}/cart`,
     });
-
     res.json({ url: session.url });
   } catch (err) {
     console.error(err);
@@ -210,6 +186,5 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`Server listening on http://localhost:${PORT}`);
 });

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Plus, RefreshCw, Edit, Trash2, Upload, ShoppingBag, TrendingUp, DollarSign, Users, Star } from "lucide-react";
+import { Package, Plus, RefreshCw, Edit, Trash2, Upload, ShoppingBag, TrendingUp, DollarSign, Users, Star, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/config";
 import { formatCurrency } from "@/lib/currency";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Product {
   id: string;
@@ -23,6 +26,10 @@ interface Product {
 }
 
 const Admin = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, revenue: 0, customers: 0 });
@@ -43,10 +50,17 @@ const Admin = () => {
   });
 
   useEffect(() => {
-    fetchProducts();
-    fetchStats();
-    fetchFeatured();
-  }, []);
+    if (authLoading) return;
+    if (!user) { navigate("/login"); return; }
+    supabase.from("users").select("role").eq("id", user.id).single().then(({ data }) => {
+      if (data?.role !== "admin") { navigate("/"); return; }
+      setIsAdmin(true);
+      setAuthChecked(true);
+      fetchProducts();
+      fetchStats();
+      fetchFeatured();
+    });
+  }, [user, authLoading]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -220,11 +234,22 @@ const Admin = () => {
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                 Products
               </Button>
+              <Button onClick={() => { supabase.auth.signOut(); navigate("/"); }} variant="outline" size="sm" className="rounded-full border-red-500/30 text-red-400">
+                <LogOut className="h-3.5 w-3.5 mr-1.5" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
+      {!authChecked ? (
+        <section className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-20">
+            <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        </section>
+      ) : (
       <section className="container mx-auto px-4">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {statCards.map((stat) => (
@@ -516,6 +541,7 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </section>
+      )}
     </main>
   );
 };
