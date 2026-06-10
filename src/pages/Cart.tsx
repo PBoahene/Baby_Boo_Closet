@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CartItem, parseCart, serializeCart, subtotal as subtotalCart } from "@/lib/cart";
-import { apiUrl, APP_BASE_URL } from "@/lib/config";
 import { formatCurrency } from "@/lib/currency";
 
 const Cart = () => {
@@ -39,31 +38,7 @@ const Cart = () => {
 
   async function proceedToCheckout() {
     if (cart.length === 0) return;
-
-    try {
-      const res = await fetch(apiUrl("/api/create-checkout-session"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cart,
-          success_url: `${APP_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${APP_BASE_URL}/cart`,
-        }),
-      });
-      const data = await res.json();
-      const url = data?.url;
-      if (url) {
-        // Clear cart before redirecting (optional UX choice)
-        localStorage.removeItem("cart");
-        window.location.href = url;
-      } else {
-        console.error(data);
-        alert("Could not create checkout session. See console for details.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Could not create checkout session. Check server logs.");
-    }
+    navigate("/checkout");
   }
 
   return (

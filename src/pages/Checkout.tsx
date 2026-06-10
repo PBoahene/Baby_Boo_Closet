@@ -1,17 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, MapPin, Smartphone, Wallet } from "lucide-react";
+import { Smartphone, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { CartItem, parseCart, subtotal as calculateSubtotal } from "@/lib/cart";
+import { apiUrl } from "@/lib/config";
+import { formatCurrency } from "@/lib/currency";
+import { usePaystackPayment } from "react-paystack";
 
 const checkoutSchema = z.object({
   firstName: z.string().min(2, "First name required"),
@@ -22,7 +32,9 @@ const checkoutSchema = z.object({
   city: z.string().min(2, "City required"),
   postalCode: z.string().min(2, "Postal code required"),
   region: z.string().min(2, "Region required"),
-  paymentMethod: z.enum(["mtn", "vodafone", "airteltigo", "bank"], { errorMap: () => ({ message: "Select payment method" }) }),
+  paymentMethod: z.enum(["mtn", "vodafone", "airteltigo", "bank"], {
+    errorMap: () => ({ message: "Select payment method" }),
+  }),
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -31,6 +43,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [paymentRef, setPaymentRef] = useState<string>("");
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -47,42 +61,83 @@ const Checkout = () => {
     },
   });
 
-  // Mock cart items
-  const cartItems = [
-    { id: 1, name: "School Uniform Set", price: 89.99, quantity: 2, image: "/placeholder.jpg" },
-    { id: 2, name: "Kids Underwear Pack", price: 34.99, quantity: 1, image: "/placeholder.jpg" },
-  ];
+  useEffect(() => {
+    const raw = localStorage.getItem("cart");
+    const items = parseCart(raw);
+    if (items.length === 0) {
+      navigate("/cart");
+      return;
+    }
+    setCart(items);
+  }, [navigate]);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = calculateSubtotal(cart);
   const shipping = subtotal > 200 ? 0 : 15;
   const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
 
+  const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "";
+
+  const initializePayment = usePaystackPayment({
+    publicKey,
+    email: "",
+    amount: 0,
+    currency: "GHS" as const,
+    channels: ["mobile_money"],
+    reference: "",
+  });
+
   const onSubmit = async (values: CheckoutFormValues) => {
     setIsProcessing(true);
-    
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Process payment with selected payment method
-      const response = await fetch("/api/checkout", {
+    try {
+      const reference = `BB-${Date.now()}`;
+
+      const orderPayload = {
+        order: {
+          ...values,
+          total,
+          items: cart,
+          status: "PENDING",
+          payment_reference: reference,
+          payment_method: values.paymentMethod,
+        },
+      };
+
+      const orderRes = await fetch(apiUrl("/api/orders"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...values,
-          items: cartItems,
-          total,
-        }),
+        body: JSON.stringify(orderPayload),
       });
 
-      if (!response.ok) throw new Error("Checkout failed");
+      if (!orderRes.ok) throw new Error("Failed to create order");
 
-      toast.success("Order placed successfully!");
-      navigate("/checkout/success");
+      initializePayment({
+        config: {
+          email: values.email,
+          amount: Math.round(total * 100),
+          reference,
+          currency: "GHS",
+          channels: ["mobile_money"],
+        },
+        onSuccess: () => {
+          fetch(apiUrl(`/api/paystack/verify/${reference}`))
+            .then(() => {
+              localStorage.removeItem("cart");
+              navigate("/checkout/success");
+            })
+            .catch(() => {
+              navigate("/checkout/success");
+            });
+        },
+        onClose: () => {
+          setIsProcessing(false);
+          toast.error("Payment cancelled. Your order is saved as pending.");
+        },
+      });
     } catch (error) {
+      console.error(error);
       toast.error("Failed to process order. Please try again.");
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -97,40 +152,50 @@ const Checkout = () => {
               <div
                 key={step}
                 className={`flex items-center gap-2 pb-2 border-b-2 transition-colors ${
-                  currentStep === step ? "border-primary text-primary" : "border-white/10 text-gray-400"
+                  currentStep === step
+                    ? "border-primary text-primary"
+                    : "border-white/10 text-gray-400"
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  currentStep >= step ? "bg-primary text-black" : "bg-white/10 text-white"
-                }`}>
-                  {currentStep > step ? <CheckCircle2 className="h-4 w-4" /> : step}
-                </div>
-                <span className="text-sm">
-                  {step === 1 && "Shipping"}
-                  {step === 2 && "Payment"}
-                  {step === 3 && "Review"}
+                <span
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
+                    currentStep === step
+                      ? "bg-primary text-primary-foreground"
+                      : currentStep > step
+                      ? "bg-green-500 text-white"
+                      : "bg-white/10 text-gray-400"
+                  }`}
+                >
+                  {currentStep > step ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    step
+                  )}
+                </span>
+                <span className="text-sm hidden sm:inline">
+                  {step === 1
+                    ? "Shipping"
+                    : step === 2
+                    ? "Payment"
+                    : "Review"}
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Form Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
                 {/* Step 1: Shipping */}
                 {currentStep === 1 && (
                   <Card className="border-white/10 bg-card/90">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <MapPin className="h-5 w-5" />
-                        Shipping Information
-                      </CardTitle>
+                      <CardTitle>Shipping Information</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
                           name="firstName"
@@ -138,7 +203,11 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>First Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="John" {...field} />
+                                <Input
+                                  placeholder="John"
+                                  className="bg-black/40 border-white/10 text-white"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -151,36 +220,11 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>Last Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Doe" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input type="email" placeholder="john@example.com" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="phone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Phone Number</FormLabel>
-                              <FormControl>
-                                <Input type="tel" placeholder="+233..." {...field} />
+                                <Input
+                                  placeholder="Doe"
+                                  className="bg-black/40 border-white/10 text-white"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -190,19 +234,60 @@ const Checkout = () => {
 
                       <FormField
                         control={form.control}
-                        name="address"
+                        name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Street Address</FormLabel>
+                            <FormLabel>Email</FormLabel>
                             <FormControl>
-                              <Input placeholder="123 Main Street" {...field} />
+                              <Input
+                                type="email"
+                                placeholder="john@example.com"
+                                className="bg-black/40 border-white/10 text-white"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      <div className="grid md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="0244xxxxxx"
+                                className="bg-black/40 border-white/10 text-white"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Address</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="123 Main St"
+                                className="bg-black/40 border-white/10 text-white"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-3 gap-4">
                         <FormField
                           control={form.control}
                           name="city"
@@ -210,7 +295,11 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>City</FormLabel>
                               <FormControl>
-                                <Input placeholder="Accra" {...field} />
+                                <Input
+                                  placeholder="Accra"
+                                  className="bg-black/40 border-white/10 text-white"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -223,7 +312,11 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>Region</FormLabel>
                               <FormControl>
-                                <Input placeholder="Greater Accra" {...field} />
+                                <Input
+                                  placeholder="Greater Accra"
+                                  className="bg-black/40 border-white/10 text-white"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -236,7 +329,11 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>Postal Code</FormLabel>
                               <FormControl>
-                                <Input placeholder="00100" {...field} />
+                                <Input
+                                  placeholder="00233"
+                                  className="bg-black/40 border-white/10 text-white"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -245,7 +342,11 @@ const Checkout = () => {
                       </div>
 
                       <div className="flex justify-end pt-4">
-                        <Button onClick={() => setCurrentStep(2)} size="lg">
+                        <Button
+                          type="button"
+                          onClick={form.handleSubmit(() => setCurrentStep(2))}
+                          size="lg"
+                        >
                           Continue to Payment
                         </Button>
                       </div>
@@ -269,22 +370,49 @@ const Checkout = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <RadioGroup value={field.value} onValueChange={field.onChange}>
+                              <RadioGroup
+                                value={field.value}
+                                onValueChange={field.onChange}
+                              >
                                 <div className="space-y-3">
                                   {[
-                                    { id: "mtn", label: "MTN Mobile Money", icon: "📱" },
-                                    { id: "vodafone", label: "Vodafone Cash", icon: "💳" },
-                                    { id: "airteltigo", label: "AirtelTigo Money", icon: "🏦" },
-                                    { id: "bank", label: "Bank Transfer", icon: "🏛️" },
+                                    {
+                                      id: "mtn",
+                                      label: "MTN Mobile Money",
+                                      icon: "📱",
+                                    },
+                                    {
+                                      id: "vodafone",
+                                      label: "Vodafone Cash",
+                                      icon: "💳",
+                                    },
+                                    {
+                                      id: "airteltigo",
+                                      label: "AirtelTigo Money",
+                                      icon: "🏦",
+                                    },
+                                    {
+                                      id: "bank",
+                                      label: "Bank Transfer",
+                                      icon: "🏛️",
+                                    },
                                   ].map((method) => (
                                     <div
                                       key={method.id}
                                       className="flex items-center space-x-2 p-3 rounded-lg border border-white/10 hover:border-primary/50 cursor-pointer transition-colors"
                                     >
-                                      <RadioGroupItem value={method.id} id={method.id} />
-                                      <label htmlFor={method.id} className="flex-1 cursor-pointer flex items-center gap-2">
+                                      <RadioGroupItem
+                                        value={method.id}
+                                        id={method.id}
+                                      />
+                                      <label
+                                        htmlFor={method.id}
+                                        className="flex-1 cursor-pointer flex items-center gap-2"
+                                      >
                                         <span>{method.icon}</span>
-                                        <span className="text-white">{method.label}</span>
+                                        <span className="text-white">
+                                          {method.label}
+                                        </span>
                                       </label>
                                     </div>
                                   ))}
@@ -296,11 +424,30 @@ const Checkout = () => {
                         )}
                       />
 
+                      <div className="rounded-lg bg-black/40 p-4 text-sm text-gray-300">
+                        <p className="font-medium text-white mb-1">
+                          Pay with Mobile Money
+                        </p>
+                        <p>
+                          You will be prompted to complete payment via Paystack.
+                          MTN, Vodafone, and AirtelTigo Mobile Money accepted.
+                        </p>
+                      </div>
+
                       <div className="flex justify-between pt-4">
-                        <Button variant="outline" onClick={() => setCurrentStep(1)} size="lg">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setCurrentStep(1)}
+                          size="lg"
+                        >
                           Back
                         </Button>
-                        <Button onClick={() => setCurrentStep(3)} size="lg">
+                        <Button
+                          type="button"
+                          onClick={form.handleSubmit(() => setCurrentStep(3))}
+                          size="lg"
+                        >
                           Review Order
                         </Button>
                       </div>
@@ -316,29 +463,43 @@ const Checkout = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="p-4 bg-black/40 rounded-lg space-y-3">
-                        <h3 className="font-semibold text-white">Shipping To:</h3>
+                        <h3 className="font-semibold text-white">
+                          Shipping To:
+                        </h3>
                         <p className="text-sm text-gray-400">
-                          {form.getValues("firstName")} {form.getValues("lastName")}<br />
-                          {form.getValues("address")}<br />
-                          {form.getValues("city")}, {form.getValues("region")}<br />
+                          {form.getValues("firstName")}{" "}
+                          {form.getValues("lastName")}
+                          <br />
+                          {form.getValues("address")}
+                          <br />
+                          {form.getValues("city")}, {form.getValues("region")}
+                          <br />
                           {form.getValues("phone")}
                         </p>
                       </div>
 
                       <p className="text-sm text-gray-400">
-                        <strong>Payment Method:</strong> {form.getValues("paymentMethod").toUpperCase()}
+                        <strong>Payment Method:</strong>{" "}
+                        {form.getValues("paymentMethod").toUpperCase()}
                       </p>
 
                       <div className="flex justify-between pt-4">
-                        <Button variant="outline" onClick={() => setCurrentStep(2)} size="lg">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setCurrentStep(2)}
+                          size="lg"
+                        >
                           Back
                         </Button>
                         <Button
-                          onClick={form.handleSubmit(onSubmit)}
+                          type="submit"
                           disabled={isProcessing}
                           size="lg"
                         >
-                          {isProcessing ? "Processing..." : "Place Order"}
+                          {isProcessing
+                            ? "Processing..."
+                            : `Pay ${formatCurrency(total)} with Momo`}
                         </Button>
                       </div>
                     </CardContent>
@@ -355,43 +516,58 @@ const Checkout = () => {
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Items */}
                 <div className="space-y-3 max-h-48 overflow-y-auto">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm pb-2 border-b border-white/10">
+                  {cart.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex justify-between text-sm pb-2 border-b border-white/10"
+                    >
                       <div>
                         <p className="text-white">{item.name}</p>
-                        <p className="text-gray-400">Qty: {item.quantity}</p>
+                        <p className="text-gray-400">Qty: {item.qty}</p>
                       </div>
-                      <p className="text-white font-semibold">₵{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-white font-semibold">
+                        {formatCurrency(item.price * item.qty)}
+                      </p>
                     </div>
                   ))}
                 </div>
 
-                {/* Totals */}
                 <div className="space-y-2 pt-2 border-t border-white/10">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Subtotal</span>
-                    <span className="text-white">₵{subtotal.toFixed(2)}</span>
+                    <span className="text-white">
+                      {formatCurrency(subtotal)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Shipping</span>
-                    <span className="text-white">{shipping === 0 ? "Free" : `₵${shipping.toFixed(2)}`}</span>
+                    <span className="text-white">
+                      {shipping === 0 ? "Free" : formatCurrency(shipping)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Tax</span>
-                    <span className="text-white">₵{tax.toFixed(2)}</span>
+                    <span className="text-white">{formatCurrency(tax)}</span>
                   </div>
 
                   <div className="flex justify-between font-bold text-lg pt-2 border-t border-white/10">
                     <span>Total</span>
-                    <span className="text-primary">₵{total.toFixed(2)}</span>
+                    <span className="text-primary">
+                      {formatCurrency(total)}
+                    </span>
                   </div>
                 </div>
 
                 {shipping === 0 && (
-                  <Badge className="w-full justify-center py-2">Free Shipping Applied</Badge>
+                  <Badge className="w-full justify-center py-2">
+                    Free Shipping Applied
+                  </Badge>
                 )}
+
+                <div className="text-center text-xs text-gray-500 mt-2">
+                  Secured by Paystack
+                </div>
               </CardContent>
             </Card>
           </div>

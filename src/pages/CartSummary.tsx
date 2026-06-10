@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, ArrowLeft, Truck, Shield, CreditCard } from "lucide-react";
 import { CartItem, parseCart, subtotal as calculateSubtotal } from "@/lib/cart";
-import { apiUrl, APP_BASE_URL } from "@/lib/config";
+import { APP_BASE_URL } from "@/lib/config";
 import { formatCurrency } from "@/lib/currency";
 
 const CartSummary = () => {
+  const navigate = useNavigate();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -35,25 +36,7 @@ const CartSummary = () => {
   };
 
   const proceedToCheckout = async () => {
-    try {
-      const res = await fetch(apiUrl("/api/create-checkout-session"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          cart, 
-          success_url: `${APP_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`, 
-          cancel_url: `${APP_BASE_URL}/cart/summary` 
-        }),
-      });
-      const data = await res.json();
-      const url = data?.url;
-      if (url) {
-        localStorage.removeItem("cart");
-        window.location.href = url;
-      }
-    } catch (err) {
-      console.error("Checkout error:", err);
-    }
+    navigate("/checkout");
   };
 
   return (
@@ -201,7 +184,7 @@ const CartSummary = () => {
                 </Button>
 
                 <div className="text-center text-xs text-muted-foreground mt-2">
-                  Secure checkout powered by Stripe
+                  Secure checkout powered by Paystack
                 </div>
               </CardContent>
             </Card>

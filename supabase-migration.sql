@@ -27,6 +27,14 @@ CREATE TABLE orders (
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   status TEXT NOT NULL DEFAULT 'PENDING',
   total_cents INTEGER NOT NULL DEFAULT 0,
+  customer_email TEXT,
+  customer_name TEXT,
+  customer_phone TEXT,
+  shipping_address TEXT,
+  shipping_city TEXT,
+  shipping_region TEXT,
+  payment_reference TEXT,
+  payment_method TEXT DEFAULT 'mobile_money',
   created_at TIMESTAMPTZ DEFAULT now()
 );
 

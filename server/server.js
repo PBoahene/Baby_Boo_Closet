@@ -1,6 +1,7 @@
 import express from "express";
 import { createClient } from "@supabase/supabase-js";
 import cors from "cors";
+import crypto from "crypto";
 
 const app = express();
 app.use(cors());
@@ -55,14 +56,22 @@ app.post("/api/orders", async (req, res) => {
   if (!order) return res.status(400).json({ error: "Missing order object" });
   const { data, error } = await supabase.from("orders").insert({
     user_id: order.user_id || null,
-    status: "PENDING",
+    status: order.status || "PENDING",
     total_cents: Math.round((order.total || 0) * 100),
+    customer_email: order.email || null,
+    customer_name: order.firstName && order.lastName ? `${order.firstName} ${order.lastName}` : null,
+    customer_phone: order.phone || null,
+    shipping_address: order.address || null,
+    shipping_city: order.city || null,
+    shipping_region: order.region || null,
+    payment_reference: order.payment_reference || null,
+    payment_method: order.payment_method || "mobile_money",
   }).select().single();
   if (error) return res.status(500).json({ error: error.message });
   if (order.items?.length) {
     const items = order.items.map((item) => ({
       order_id: data.id,
-      product_id: item.product_id,
+      product_id: item.product_id || item.id,
       quantity: item.qty || 1,
       unit_price_cents: Math.round((item.price || 0) * 100),
     }));
@@ -182,6 +191,73 @@ app.post("/api/create-checkout-session", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Stripe checkout error", details: String(err) });
   }
+});
+
+// Paystack: initialize transaction
+app.post("/api/paystack/initialize", async (req, res) => {
+  const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+  if (!paystackSecret) return res.status(500).json({ error: "Paystack secret key not configured" });
+  const Paystack = (await import("paystack")).default;
+  const paystack = new Paystack(paystackSecret);
+  const { email, amount, order } = req.body;
+  if (!email || !amount) return res.status(400).json({ error: "Missing email or amount" });
+  try {
+    const response = await paystack.transaction.initialize({
+      amount: String(amount),
+      email,
+      reference: `BB-${Date.now()}`,
+      currency: "GHS",
+      channels: ["mobile_money"],
+      metadata: { order_id: order?.order_id || null },
+    });
+    res.json({
+      reference: response.data.reference,
+      authorization_url: response.data.authorization_url,
+      access_code: response.data.access_code,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Paystack initialize error", details: String(err) });
+  }
+});
+
+// Paystack: verify transaction
+app.get("/api/paystack/verify/:reference", async (req, res) => {
+  const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+  if (!paystackSecret) return res.status(500).json({ error: "Paystack secret key not configured" });
+  const Paystack = (await import("paystack")).default;
+  const paystack = new Paystack(paystackSecret);
+  try {
+    const response = await paystack.transaction.verify(req.params.reference);
+    if (response.data.status === "success") {
+      await supabase.from("orders").update({
+        status: "PAID",
+        payment_reference: req.params.reference,
+      }).eq("payment_reference", req.params.reference);
+    }
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: "Verification failed", details: String(err) });
+  }
+});
+
+// Paystack: webhook
+app.post("/api/paystack/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+  const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+  if (!paystackSecret) return res.status(500).json({ error: "Paystack secret key not configured" });
+  const hash = crypto.createHmac("sha512", paystackSecret).update(JSON.stringify(req.body)).digest("hex");
+  if (hash !== req.headers["x-paystack-signature"]) return res.status(400).send("Invalid signature");
+  const event = req.body;
+  if (event.event === "charge.success") {
+    const ref = event.data?.reference;
+    if (ref) {
+      await supabase.from("orders").update({
+        status: "PAID",
+        payment_reference: ref,
+      }).eq("payment_reference", ref);
+    }
+  }
+  res.sendStatus(200);
 });
 
 const PORT = process.env.PORT || 4000;
