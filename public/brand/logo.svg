@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="primary-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="star-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="250" cy="200" r="110" fill="url(#primary-grad)" opacity="0.1"/>
+
+  <!-- Hanger icon -->
+  <g transform="translate(250, 195)" fill="none" stroke="url(#primary-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Hanger hook -->
+    <path d="M0,-50 C0,-50 0,-65 15,-65 C30,-65 30,-50 30,-50"/>
+    <!-- Hanger body -->
+    <path d="M-55,0 L55,0"/>
+    <!-- Hanger curves -->
+    <path d="M-55,0 C-65,20 -40,30 -25,15"/>
+    <path d="M55,0 C65,20 40,30 25,15"/>
+    <!-- Small dress/onesie silhouette -->
+    <path d="M-20,15 L-20,45 C-20,55 -10,55 -10,45 L-10,30 L10,30 L10,45 C10,55 20,55 20,45 L20,15" stroke-width="5"/>
+  </g>
+
+  <!-- Decorative stars -->
+  <circle cx="160" cy="130" r="4" fill="url(#star-grad)" opacity="0.6"/>
+  <circle cx="340" cy="140" r="3" fill="url(#star-grad)" opacity="0.4"/>
+  <circle cx="180" cy="270" r="3" fill="url(#star-grad)" opacity="0.5"/>
+  <circle cx="320" cy="260" r="4" fill="url(#star-grad)" opacity="0.3"/>
+  <circle cx="150" cy="200" r="2.5" fill="url(#star-grad)" opacity="0.4"/>
+  <circle cx="350" cy="190" r="2" fill="url(#star-grad)" opacity="0.5"/>
+
+  <!-- Brand name -->
+  <text x="250" y="360" text-anchor="middle" font-family="'Georgia', serif" font-size="52" font-weight="bold" fill="url(#primary-grad)" letter-spacing="4">
+    Baby Boo
+  </text>
+  <text x="250" y="400" text-anchor="middle" font-family="'Arial', sans-serif" font-size="20" font-weight="600" fill="#A1A1AA" letter-spacing="8">
+    CLOSET
+  </text>
+
+  <!-- Tagline -->
+  <text x="250" y="440" text-anchor="middle" font-family="'Arial', sans-serif" font-size="12" fill="#71717A" letter-spacing="3">
+    CHILDREN'S WEAR
+  </text>
+</svg>

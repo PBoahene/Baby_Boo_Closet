@@ -49,15 +49,9 @@ const Header = () => {
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="flex h-18 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3 group" aria-label="Baby Boo Closet home">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-kids-pink to-kids-blue text-base font-extrabold tracking-wide text-white shadow-soft shadow-primary/25 transition-transform duration-300 group-hover:scale-105" style={{ fontFamily: '"Outfit", sans-serif' }}>
-              BB
-            </div>
-            <div>
-              <p className="text-base font-bold leading-none md:text-lg tracking-tight" style={{ fontFamily: '"Outfit", sans-serif' }}>BABY-BOO CLOSET</p>
-              <p className="text-xs text-muted-foreground tracking-wide">Modern Kidswear and School Essentials</p>
-            </div>
+        <div className="flex h-32 items-center justify-between gap-4">
+          <Link to="/" className="flex items-center group" aria-label="Baby Boo Closet home">
+            <img src="/brand/logo.svg" alt="Baby Boo" className="h-28 w-28 object-contain" />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">

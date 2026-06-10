@@ -5,44 +5,16 @@ import HowItWorks from "@/components/HowItWorks";
 import Portfolio from "@/components/Portfolio";
 import Testimonials from "@/components/Testimonials";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock3, Heart, ShieldCheck, Star, Users } from "lucide-react";
+import { Clock3, ShieldCheck, Users } from "lucide-react";
 
 const Index = () => {
-  const categoryLinks = [
-    { label: "Boys", href: "/shop?category=Casual%20Wear", accent: "text-kids-blue" },
-    { label: "Girls", href: "/shop?category=Dresses", accent: "text-kids-pink" },
-    { label: "Infants", href: "/shop?category=Casual%20Wear", accent: "text-kids-yellow" },
-    { label: "Underwear", href: "/shop?category=Underwear", accent: "text-primary" },
-    { label: "Dresses", href: "/shop?category=Dresses", accent: "text-kids-purple" },
-  ];
-
   return (
     <main className="min-h-screen">
       <HeroSection />
 
-      <section className="py-8 md:py-10">
-        <div className="container mx-auto px-4">
-          <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
-            <h2 className="text-2xl font-bold md:text-3xl">Shop By Category</h2>
-            <p className="mt-2 text-muted-foreground">Quick links to the most requested sections for parents and guardians.</p>
-
-            <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-5">
-              {categoryLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="group rounded-2xl border border-white/15 bg-card/70 px-4 py-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/60"
-                >
-                  <p className={`text-base font-semibold ${item.accent}`}>{item.label}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Explore styles</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <Portfolio />
 
       <section className="py-8 md:py-10">
         <div className="container mx-auto px-4">
@@ -98,7 +70,6 @@ const Index = () => {
       </section>
 
       <HowItWorks />
-      <Portfolio />
       <Testimonials />
     </main>
   );

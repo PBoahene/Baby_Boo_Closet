@@ -8,6 +8,13 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-14">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
           <div>
+            <div className="mb-5 flex items-center gap-3">
+              <img src="/brand/logo.svg" alt="Baby Boo" className="h-9 w-9 object-contain" />
+              <div>
+                <p className="text-sm font-bold leading-none" style={{ fontFamily: '"Outfit", sans-serif' }}>BABY-BOO CLOSET</p>
+                <p className="text-xs text-gray-400 mt-0.5">Modern Kidswear</p>
+              </div>
+            </div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Collections</h4>
             <ul className="space-y-2">
               <li>

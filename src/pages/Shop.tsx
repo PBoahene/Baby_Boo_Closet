@@ -136,16 +136,21 @@ const Shop = () => {
       <section className="relative overflow-hidden pb-10 pt-10 md:pt-14">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
         <div className="container mx-auto px-4 relative">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-              Shop Collection
-            </p>
-            <h1 className="mt-2 text-3xl font-bold leading-tight md:text-5xl">
-              Find everyday essentials and signature school styles
-            </h1>
-            <p className="mt-3 max-w-2xl text-muted-foreground">
-              Browse high-quality pieces built for comfort, movement, and long-lasting wear.
-            </p>
+          <div className="flex items-center justify-between gap-8">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-widest text-primary">
+                Shop Collection
+              </p>
+              <h1 className="mt-2 text-3xl font-bold leading-tight md:text-5xl">
+                Find everyday essentials and signature school styles
+              </h1>
+              <p className="mt-3 max-w-2xl text-muted-foreground">
+                Browse high-quality pieces built for comfort, movement, and long-lasting wear.
+              </p>
+            </div>
+            <div className="hidden md:flex shrink-0 mr-8">
+              <img src="/brand/logo.svg" alt="Baby Boo" className="h-52 w-52 object-contain opacity-15" />
+            </div>
           </div>
         </div>
       </section>

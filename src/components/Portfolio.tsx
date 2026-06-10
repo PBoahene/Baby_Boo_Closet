@@ -171,22 +171,6 @@ const Portfolio = () => {
           </div>
         )}
 
-        {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mt-16 pt-12 border-t border-white/10">
-          {[
-            { label: "Projects Completed", value: "1,200+" },
-            { label: "Happy Clients", value: "5,000+" },
-            { label: "Products Created", value: "50,000+" },
-            { label: "Schools Served", value: "120+" },
-          ].map((stat, idx) => (
-            <div key={idx} className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                {stat.value}
-              </p>
-              <p className="text-gray-400 text-sm">{stat.label}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );
