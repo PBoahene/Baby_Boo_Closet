@@ -163,27 +163,19 @@ const Index = () => {
           </div>
         </div>
       </section>
-      
+
 
       <section className="py-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <div className="container mx-auto px-4 text-center">
           <div className="mx-auto max-w-4xl rounded-3xl bg-gradient-hero px-6 py-14 shadow-glow md:px-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Build your child wardrobe with confidence
-            </h2>
-            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-              Discover versatile styles for school days, weekends, and special events all in one place.
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Build your child wardrobe with confidence</h2>
+            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">Discover versatile styles for school days, weekends, and special events all in one place.</p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link to="/shop">
-                <Button variant="secondary" size="lg" className="rounded-full px-8">
-                  Shop Now
-                </Button>
+                <Button variant="secondary" size="lg" className="rounded-full px-8">Shop Now</Button>
               </Link>
               <Link to="/about">
-                <Button variant="outline" size="lg" className="rounded-full border-white/70 bg-transparent text-white hover:bg-white/10">
-                  Contact Our Team
-                </Button>
+                <Button variant="outline" size="lg" className="rounded-full border-white/70 bg-transparent text-white hover:bg-white/10">Contact Our Team</Button>
               </Link>
             </div>
           </div>
