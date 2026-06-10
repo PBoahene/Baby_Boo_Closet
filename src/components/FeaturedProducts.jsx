@@ -1,61 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { apiUrl } from "@/lib/config";
 
 const FeaturedProducts = () => {
-  const products = [
-    {
-      id: 1,
-      name: "Boys School Shirt - White",
-      price: 45.00,
-      image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=400&fit=crop",
-      category: "Boys",
-      featured: true
-    },
-    {
-      id: 2,
-      name: "Girls School Dress - Navy",
-      price: 55.00,
-      image: "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=400&h=400&fit=crop",
-      category: "Girls",
-      featured: true
-    },
-    {
-      id: 3,
-      name: "School Polo Shirt - Blue",
-      price: 40.00,
-      image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&h=400&fit=crop",
-      category: "School Gears",
-      featured: true
-    },
-    {
-      id: 4,
-      name: "Kids T-Shirt - Pink",
-      price: 35.00,
-      image: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=400&h=400&fit=crop",
-      category: "Girls",
-      featured: true
-    },
-    {
-      id: 5,
-      name: "Boys Shorts - Khaki",
-      price: 38.00,
-      image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop",
-      category: "Boys",
-      featured: true
-    },
-    {
-      id: 6,
-      name: "School Sweater - Gray",
-      price: 60.00,
-      image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=400&fit=crop",
-      category: "School Gears",
-      featured: true
-    }
-  ];
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch(apiUrl("/api/featured"))
+      .then((r) => r.json())
+      .then(setProducts)
+      .catch(() => {});
+  }, []);
+
+  if (products.length === 0) return null;
 
   return (
     <section className="py-16">
@@ -79,12 +40,10 @@ const FeaturedProducts = () => {
           {products.map((product) => (
             <Card key={product.id} className="group overflow-hidden border-white/10 bg-card/90 shadow-soft">
               <div className="relative aspect-square overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                {product.featured && (
+                <div className="h-full w-full bg-gradient-to-br from-primary/20 via-kids-blue/10 to-background flex items-center justify-center">
+                  <span className="text-3xl font-bold text-primary/40">{product.name.charAt(0)}</span>
+                </div>
+                {product.isCustomizable && (
                   <Badge className="absolute left-3 top-3 bg-gradient-hero text-white">
                     Staff Pick
                   </Badge>
@@ -102,9 +61,11 @@ const FeaturedProducts = () => {
                   <span className="text-xl font-bold text-primary">
                     GH₵{product.price.toFixed(2)}
                   </span>
-                  <Button size="sm" className="rounded-full">
-                    View Item
-                  </Button>
+                  <Link to={`/product/${product.id}`}>
+                    <Button size="sm" className="rounded-full">
+                      View Item
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

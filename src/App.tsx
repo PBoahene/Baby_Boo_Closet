@@ -15,6 +15,9 @@ import NotFound from "./pages/NotFound";
 import Cart from "./pages/Cart";
 import CartSummary from "./pages/CartSummary";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import CustomDesign from "./pages/CustomDesign";
+import ProductDetail from "./pages/ProductDetail";
+import Checkout from "./pages/Checkout";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import WhatsAppQuickOrder from "./components/WhatsAppQuickOrder";
@@ -32,6 +35,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/product/:productId" element={<ProductDetail />} />
+          <Route path="/custom-design" element={<CustomDesign />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/about" element={<About />} />
@@ -39,6 +44,7 @@ const App = () => {
           <Route path="/terms" element={<Terms />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/cart/summary" element={<CartSummary />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout/success" element={<CheckoutSuccess />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

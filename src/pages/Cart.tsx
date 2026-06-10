@@ -84,7 +84,7 @@ const Cart = () => {
               <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-white shadow-sm">
                 <div className="w-full sm:w-28 h-28 bg-muted rounded overflow-hidden flex items-center justify-center">
                   {item.image ? (
-                    <img src={item.image} alt={item.name} className="object-cover w-full h-full" />
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-kids-blue/10 flex items-center justify-center text-primary/40 font-bold text-lg">{item.name.charAt(0)}</div>
                   ) : (
                     <div className="text-sm text-muted-foreground">No image</div>
                   )}

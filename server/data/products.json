@@ -1,24 +1,23 @@
 [
   {
-    "id": "1",
-    "name": "Flawsome Elegant Boys Thermal Set",
-    "price": 24.99,
-    "originalPrice": 34.99,
-    "image": "/api/placeholder/300/400",
-    "category": "School Uniforms",
-    "isCustomizable": true,
-    "colors": ["#1e40af", "#ffffff", "#dc2626", "#059669"],
-    "sizes": ["XS","S","M","L","XL"]
-  },
-  {
-    "id": "2", 
+    "id": "2",
     "name": "Modern Fancy Boys Thermal Inner Wear Set",
     "price": 19.99,
     "image": "/api/placeholder/300/400",
     "category": "Casual Wear",
     "isCustomizable": true,
-    "colors": ["#f59e0b", "#ec4899", "#3b82f6", "#10b981"],
-    "sizes": ["XS","S","M","L"]
+    "colors": [
+      "#f59e0b",
+      "#ec4899",
+      "#3b82f6",
+      "#10b981"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ]
   },
   {
     "id": "3",
@@ -28,8 +27,18 @@
     "image": "/api/placeholder/300/400",
     "category": "Jackets & Coats",
     "isCustomizable": true,
-    "colors": ["#1e293b", "#dc2626", "#059669"],
-    "sizes": ["XS","S","M","L","XL"]
+    "colors": [
+      "#1e293b",
+      "#dc2626",
+      "#059669"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   },
   {
     "id": "4",
@@ -38,8 +47,18 @@
     "image": "/api/placeholder/300/400",
     "category": "Jackets & Coats",
     "isCustomizable": true,
-    "colors": ["#7c3aed", "#f59e0b", "#ef4444", "#06b6d4"],
-    "sizes": ["S","M","L","XL"]
+    "colors": [
+      "#7c3aed",
+      "#f59e0b",
+      "#ef4444",
+      "#06b6d4"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   },
   {
     "id": "5",
@@ -49,8 +68,17 @@
     "image": "/api/placeholder/300/400",
     "category": "Dresses",
     "isCustomizable": true,
-    "colors": ["#ec4899", "#3b82f6", "#f59e0b"],
-    "sizes": ["XS","S","M","L"]
+    "colors": [
+      "#ec4899",
+      "#3b82f6",
+      "#f59e0b"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ]
   },
   {
     "id": "6",
@@ -59,8 +87,16 @@
     "image": "/api/placeholder/300/400",
     "category": "Casual Wear",
     "isCustomizable": true,
-    "colors": ["#1e40af", "#059669", "#dc2626"],
-    "sizes": ["XS","S","M"]
+    "colors": [
+      "#1e40af",
+      "#059669",
+      "#dc2626"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M"
+    ]
   },
   {
     "id": "7",
@@ -70,8 +106,18 @@
     "image": "/api/placeholder/300/400",
     "category": "School Uniforms",
     "isCustomizable": true,
-    "colors": ["#1e40af", "#ffffff", "#dc2626"],
-    "sizes": ["XS","S","M","L","XL"]
+    "colors": [
+      "#1e40af",
+      "#ffffff",
+      "#dc2626"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   },
   {
     "id": "8",
@@ -81,8 +127,17 @@
     "image": "/api/placeholder/300/400",
     "category": "Sweaters",
     "isCustomizable": true,
-    "colors": ["#7c3aed", "#1e293b", "#ef4444"],
-    "sizes": ["S","M","L","XL"]
+    "colors": [
+      "#7c3aed",
+      "#1e293b",
+      "#ef4444"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   },
   {
     "id": "9",
@@ -91,8 +146,17 @@
     "image": "/api/placeholder/300/400",
     "category": "Underwear",
     "isCustomizable": false,
-    "colors": ["#ffffff", "#ec4899", "#3b82f6"],
-    "sizes": ["XS","S","M","L"]
+    "colors": [
+      "#ffffff",
+      "#ec4899",
+      "#3b82f6"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ]
   },
   {
     "id": "10",
@@ -102,8 +166,17 @@
     "image": "/api/placeholder/300/400",
     "category": "Dresses",
     "isCustomizable": true,
-    "colors": ["#ec4899", "#7c3aed", "#f59e0b"],
-    "sizes": ["XS","S","M","L"]
+    "colors": [
+      "#ec4899",
+      "#7c3aed",
+      "#f59e0b"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ]
   },
   {
     "id": "11",
@@ -112,8 +185,17 @@
     "image": "/api/placeholder/300/400",
     "category": "Casual Wear",
     "isCustomizable": true,
-    "colors": ["#1e40af", "#059669", "#ef4444"],
-    "sizes": ["S","M","L","XL"]
+    "colors": [
+      "#1e40af",
+      "#059669",
+      "#ef4444"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   },
   {
     "id": "12",
@@ -123,7 +205,28 @@
     "image": "/api/placeholder/300/400",
     "category": "School Uniforms",
     "isCustomizable": true,
-    "colors": ["#1e293b", "#1e40af", "#059669"],
-    "sizes": ["XS","S","M","L","XL"]
+    "colors": [
+      "#1e293b",
+      "#1e40af",
+      "#059669"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
+  },
+  {
+    "id": "1781060451980",
+    "name": "hj",
+    "price": 22,
+    "originalPrice": 220.97,
+    "image": "",
+    "category": "Underwear",
+    "isCustomizable": true,
+    "colors": [],
+    "sizes": []
   }
 ]

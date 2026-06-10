@@ -2,14 +2,11 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-const FRONTEND_URL = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/+$/, "");
+const FRONTEND_URL = "http://localhost:5173";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
@@ -55,6 +52,28 @@ app.post("/api/orders", (req, res) => {
   writeJson(ORDERS_FILE, orders);
 
   res.json({ ok: true, order: newOrder });
+});
+
+app.get("/api/orders", (req, res) => {
+  const orders = readJson(ORDERS_FILE) || [];
+  res.json(orders);
+});
+
+app.get("/api/admin/stats", (req, res) => {
+  const products = readJson(PRODUCTS_FILE) || [];
+  const orders = readJson(ORDERS_FILE) || [];
+
+  const totalProducts = products.length;
+  const totalOrders = orders.length;
+  const revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const customers = new Set(orders.map((o) => o.email).filter(Boolean)).size;
+
+  res.json({
+    totalProducts,
+    totalOrders,
+    revenue,
+    customers,
+  });
 });
 
 // Admin: Add single product
@@ -109,6 +128,21 @@ app.delete("/api/admin/products/:id", (req, res) => {
   
   writeJson(PRODUCTS_FILE, filtered);
   res.json({ ok: true, message: "Product deleted" });
+});
+
+app.get("/api/featured", (req, res) => {
+  const products = readJson(PRODUCTS_FILE) || [];
+  const featuredIds = readJson(path.join(DATA_DIR, "featured-ids.json")) || [];
+  const featured = products.filter((p) => featuredIds.includes(p.id));
+  res.json(featured);
+});
+
+// Admin: Update featured product IDs
+app.put("/api/admin/featured", (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids)) return res.status(400).json({ error: "ids must be an array" });
+  writeJson(path.join(DATA_DIR, "featured-ids.json"), ids);
+  res.json({ ok: true, ids });
 });
 
 // Stripe payment intent

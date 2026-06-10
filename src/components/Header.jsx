@@ -34,6 +34,7 @@ const Header = () => {
   const navItems = [
     { to: "/", label: "Home" },
     { to: "/shop", label: "Shop" },
+    { to: "/custom-design", label: "Upload Design" },
     { to: "/school-kids", label: "School Kids" },
     { to: "/about", label: "About" },
     { to: "/terms", label: "Terms" },
@@ -41,30 +42,30 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-white/92 backdrop-blur">
-      <div className="bg-foreground text-background">
-        <div className="container mx-auto px-4 py-2 text-center text-xs font-medium md:text-sm">
+      <div className="bg-gray-900/90">
+        <div className="container mx-auto px-4 py-2 text-center text-xs font-medium md:text-sm text-gray-200">
           Free delivery on orders above GHc 300 and easy returns within 7 days.
         </div>
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="flex h-20 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3" aria-label="Baby Boo Closet home">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-hero text-sm font-bold text-white shadow-soft">
+        <div className="flex h-18 items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-3 group" aria-label="Baby Boo Closet home">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-kids-pink to-kids-blue text-base font-extrabold tracking-wide text-white shadow-soft shadow-primary/25 transition-transform duration-300 group-hover:scale-105" style={{ fontFamily: '"Outfit", sans-serif' }}>
               BB
             </div>
             <div>
-              <p className="text-base font-semibold leading-none md:text-lg">BABY-BOO CLOSET</p>
-              <p className="text-xs text-muted-foreground">Modern Kidswear and School Essentials</p>
+              <p className="text-base font-bold leading-none md:text-lg tracking-tight" style={{ fontFamily: '"Outfit", sans-serif' }}>BABY-BOO CLOSET</p>
+              <p className="text-xs text-muted-foreground tracking-wide">Modern Kidswear and School Essentials</p>
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
             {navItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
-                className={`text-sm font-semibold ${isActive(item.to) ? "text-primary" : "text-foreground/80 hover:text-foreground"}`}
+                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${isActive(item.to) ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/10"}`}
               >
                 {item.label}
               </Link>
@@ -72,17 +73,13 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link to="/shop" className="hidden md:block">
-              <Button className="rounded-full px-5">Explore Collection</Button>
-            </Link>
-
             <Link to="/login">
               <Button variant="ghost" size="icon" aria-label="Account">
                 <User className="h-5 w-5" />
               </Button>
             </Link>
 
-            <Link to="/cart" className="relative">
+            <Link to="/cart" className="relative md:mr-4">
               <Button variant="outline" className="rounded-full px-4">
                 <ShoppingBag className="mr-2 h-4 w-4" /> Cart
               </Button>
@@ -104,19 +101,19 @@ const Header = () => {
         </div>
 
         {isMenuOpen && (
-          <nav className="space-y-2 border-t border-border/80 py-4 lg:hidden">
+          <nav className="space-y-1 border-t border-border/80 py-4 lg:hidden">
             {navItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 onClick={() => setIsMenuOpen(false)}
-                className={`block rounded-md px-3 py-2 text-sm font-semibold ${isActive(item.to) ? "bg-primary/10 text-primary" : "text-foreground/80"}`}
+                className={`block rounded-full px-4 py-2 text-sm font-medium transition-colors ${isActive(item.to) ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {item.label}
               </Link>
             ))}
-            <Link to="/shop" onClick={() => setIsMenuOpen(false)} className="block">
-              <Button className="mt-2 w-full">Explore Collection</Button>
+            <Link to="/shop" onClick={() => setIsMenuOpen(false)} className="block px-4 pt-2">
+              <Button className="w-full rounded-full">Explore Collection</Button>
             </Link>
           </nav>
         )}

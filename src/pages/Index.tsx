@@ -1,6 +1,9 @@
 import React from "react";
 import HeroSection from "@/components/HeroSection";
 import FeaturedProducts from "@/components/FeaturedProducts";
+import HowItWorks from "@/components/HowItWorks";
+import Portfolio from "@/components/Portfolio";
+import Testimonials from "@/components/Testimonials";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -78,94 +81,6 @@ const Index = () => {
       <FeaturedProducts />
 
       <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Designed around what parents care about most
-            </h2>
-            <p className="mx-auto max-w-2xl text-muted-foreground">
-              Clear sizing, easy ordering, secure payments, and dependable delivery.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <Card className="bg-gradient-card border-white/10">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="flex text-amber-500">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="text-lg">Perfect fit for school routines</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  My daughter now has uniforms that stay neat even after many washes. Delivery was smooth and sizing was accurate.
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-kids-pink rounded-full flex items-center justify-center">
-                    <Heart className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium">Sarah M., Parent</span>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-card border-white/10">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="flex text-amber-500">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="text-lg">Reliable for class and events</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  We ordered matching shirts for the school house team and got exactly what we requested with excellent quality.
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-kids-blue rounded-full flex items-center justify-center">
-                    <Users className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium">Mrs. Johnson, Teacher</span>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-card border-white/10">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="flex text-amber-500">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="text-lg">Professional service for schools</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Their team helped us standardize uniforms and parent ordering became much easier this term.
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-kids-purple rounded-full flex items-center justify-center">
-                    <Star className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium">David Chen, Principal</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-
-      <section className="py-16">
         <div className="container mx-auto px-4 text-center">
           <div className="mx-auto max-w-4xl rounded-3xl bg-gradient-hero px-6 py-14 shadow-glow md:px-14">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Build your child wardrobe with confidence</h2>
@@ -181,6 +96,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <HowItWorks />
+      <Portfolio />
+      <Testimonials />
     </main>
   );
 };

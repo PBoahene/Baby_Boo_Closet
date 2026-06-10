@@ -87,7 +87,7 @@ const CartSummary = () => {
                   <div key={item.id} className="flex gap-4">
                     <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
                       {item.image ? (
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-kids-blue/10 flex items-center justify-center text-primary/40 font-bold text-sm">{item.name.charAt(0)}</div>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
                           No image
