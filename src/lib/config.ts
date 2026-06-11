@@ -5,7 +5,7 @@ const rawAppBaseUrl = import.meta.env.VITE_APP_BASE_URL?.trim();
 
 export const API_BASE_URL = rawApiBaseUrl
   ? trimTrailingSlash(rawApiBaseUrl)
-  : "http://localhost:4000";
+  : "";
 
 export const APP_BASE_URL = rawAppBaseUrl
   ? trimTrailingSlash(rawAppBaseUrl)
