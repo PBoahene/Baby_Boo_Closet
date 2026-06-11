@@ -13,8 +13,11 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const FRONTEND_URL = process.env.VITE_APP_BASE_URL || "https://baby-boo-closet.vercel.app";
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error("Missing Supabase environment variables");
+if (!SUPABASE_URL) {
+  console.error("Missing VITE_SUPABASE_URL environment variable");
+}
+if (!SUPABASE_SERVICE_KEY) {
+  console.error("Missing SUPABASE_SERVICE_KEY environment variable");
 }
 
 const supabase = createClient(SUPABASE_URL || "", SUPABASE_SERVICE_KEY || "");
