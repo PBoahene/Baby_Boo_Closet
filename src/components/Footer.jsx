@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { Instagram, Mail, Phone } from "lucide-react";
 
@@ -6,7 +5,7 @@ const Footer = () => {
   return (
     <footer className="mt-20 border-t border-gray-200 bg-gray-50 text-gray-800">
       <div className="container mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div>
             <div className="mb-5 flex items-center gap-3">
               <img src="/brand/logo.svg" alt="Baby Boo" className="h-9 w-9 object-contain" />
@@ -45,7 +44,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div>
+          <div className="md:ml-12">
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Customer Care</h4>
             <ul className="space-y-2">
               <li>
@@ -69,40 +68,10 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
-          </div>
 
-          <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Get Support</h4>
-            <div className="space-y-3 text-sm text-gray-600">
-              <p className="flex items-center gap-2">
-                <Mail className="h-4 w-4" /> support@babyboocloset.com
-              </p>
-              <p className="flex items-center gap-2">
-                <Phone className="h-4 w-4" /> +233 20 000 0000
-              </p>
-              <p>Mon-Sat, 8:00 AM to 6:00 PM</p>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Stay Connected</h4>
-            <p className="mb-4 text-sm text-gray-600">
-              Get first access to new arrivals, school opening bundles, and seasonal discounts.
-            </p>
-            <form className="mb-6 flex gap-2">
-              <input
-                type="email"
-                placeholder="your-email@example.com"
-                className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-500 focus:outline-none"
-              />
-              <button type="submit" className="h-10 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800">
-                Join
-              </button>
-            </form>
-
-            <div className="flex gap-3">
+            <div className="mt-6 flex gap-3">
               <a
-                href="https://tiktok.com"
+                href="https://www.tiktok.com/@baby_boo_closet?_r=1&_t=ZS-978XZ9FzxCP"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:border-gray-500 hover:text-gray-900"
@@ -121,14 +90,42 @@ const Footer = () => {
               </a>
             </div>
           </div>
+
+          <div>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Get Support</h4>
+            <div className="mb-5 space-y-3 text-sm text-gray-600">
+              <p className="flex items-center gap-2">
+                <Mail className="h-4 w-4" /> support@babyboocloset.com
+              </p>
+              <p className="flex items-center gap-2">
+                <Phone className="h-4 w-4" /> +233 24 449 5254
+              </p>
+              <p>Mon-Sat, 8:00 AM to 6:00 PM</p>
+            </div>
+
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Stay Connected</h4>
+            <p className="mb-4 text-sm text-gray-600">
+              Get first access to new arrivals, school opening bundles, and seasonal discounts.
+            </p>
+            <form className="mb-6 flex gap-2">
+              <input
+                type="email"
+                placeholder="your-email@example.com"
+                className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-500 focus:outline-none"
+              />
+              <button type="submit" className="h-10 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800">
+                Join
+              </button>
+            </form>
+          </div>
         </div>
 
         <div className="mt-10 border-t border-gray-200 pt-6">
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <p className="text-sm text-gray-500">
-              © BABY-BOO CLOSET {new Date().getFullYear()} | Greater Accra, Ghana | Wholesale & Retail Clothing
+              &copy; BABY-BOO CLOSET {new Date().getFullYear()} | Greater Accra, Ghana | Wholesale & Retail Clothing
             </p>
-            <p className="text-xs uppercase tracking-wide text-gray-400">Secure Checkout powered by Stripe</p>
+            <p className="text-xs uppercase tracking-wide text-gray-400">Tech: Syntrix Software Engineering</p>
           </div>
         </div>
       </div>
