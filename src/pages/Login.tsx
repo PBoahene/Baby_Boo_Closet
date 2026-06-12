@@ -72,10 +72,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-kids-pink/20 via-background to-kids-blue/20 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border-gray-200 shadow-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-gray-900">
             Welcome to BABY-BOO CLOSET
           </CardTitle>
           <CardDescription>

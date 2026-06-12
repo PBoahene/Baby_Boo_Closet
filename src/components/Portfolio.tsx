@@ -91,27 +91,25 @@ const Portfolio = () => {
       : portfolioItems.filter((item) => item.category === selectedCategory);
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-16 md:py-24 bg-gray-50/50">
       <div className="container mx-auto px-4">
-        {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Our Portfolio
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
             Explore our diverse collection of custom clothing and personalized apparel creations
           </p>
         </div>
 
-        {/* Category Tabs */}
         <div className="flex justify-center mb-12 overflow-x-auto pb-2">
           <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-            <TabsList className="inline-flex bg-transparent gap-2">
+            <TabsList className="inline-flex bg-gray-100 gap-1 p-1 rounded-lg">
               {categories.map((cat) => (
                 <TabsTrigger
                   key={cat.id}
                   value={cat.id}
-                  className="data-[state=active]:bg-primary data-[state=active]:text-black bg-white/10 text-gray-400 hover:text-white transition-colors"
+                  className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm text-gray-500 hover:text-gray-900 transition-colors rounded-md"
                 >
                   {cat.label}
                 </TabsTrigger>
@@ -120,7 +118,6 @@ const Portfolio = () => {
           </Tabs>
         </div>
 
-        {/* Featured Items (3 columns grid) */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {filteredItems
             .filter((item) => item.featured)
@@ -128,49 +125,47 @@ const Portfolio = () => {
             .map((item) => (
               <Card
                 key={item.id}
-                className="border-white/10 bg-card/90 overflow-hidden group cursor-pointer hover:border-primary/50 transition-all"
+                className="border-gray-200 bg-white shadow-sm overflow-hidden group cursor-pointer hover:shadow-md transition-all"
               >
-                <div className="relative overflow-hidden aspect-video bg-black/40">
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-transparent flex items-center justify-center">
-                    <Eye className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative overflow-hidden aspect-video bg-gray-100">
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Eye className="h-8 w-8 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </div>
                 <CardContent className="pt-6 space-y-3">
-                  <Badge className="w-fit">{item.category}</Badge>
-                  <h3 className="font-bold text-white text-lg">{item.title}</h3>
-                  <p className="text-gray-400 text-sm">{item.description}</p>
+                  <Badge className="w-fit bg-gray-100 text-gray-700 hover:bg-gray-200 border-none">{item.category}</Badge>
+                  <h3 className="font-bold text-gray-900 text-lg">{item.title}</h3>
+                  <p className="text-gray-500 text-sm">{item.description}</p>
                 </CardContent>
               </Card>
             ))}
         </div>
 
-        {/* Other Items (4 columns grid) */}
         {filteredItems.filter((item) => !item.featured).length > 0 && (
           <div className="space-y-8">
-            <h3 className="text-xl font-bold text-white">More Creations</h3>
+            <h3 className="text-xl font-bold text-gray-900">More Creations</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredItems
                 .filter((item) => !item.featured)
                 .map((item) => (
                   <Card
                     key={item.id}
-                    className="border-white/10 bg-card/90 overflow-hidden group cursor-pointer hover:border-primary/50 transition-all"
+                    className="border-gray-200 bg-white shadow-sm overflow-hidden group cursor-pointer hover:shadow-md transition-all"
                   >
-                    <div className="relative overflow-hidden aspect-square bg-black/40">
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-transparent flex items-center justify-center">
-                        <Eye className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative overflow-hidden aspect-square bg-gray-100">
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Eye className="h-8 w-8 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
                     <CardContent className="pt-4 space-y-2">
-                      <h3 className="font-bold text-white">{item.title}</h3>
-                      <p className="text-gray-400 text-xs">{item.description}</p>
+                      <h3 className="font-bold text-gray-900">{item.title}</h3>
+                      <p className="text-gray-500 text-xs">{item.description}</p>
                     </CardContent>
                   </Card>
                 ))}
             </div>
           </div>
         )}
-
       </div>
     </section>
   );
