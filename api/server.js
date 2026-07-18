@@ -9,18 +9,36 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+// NOTE: process.env.* here refers to Vercel's serverless function
+// environment (Node.js), which is separate from Vite's import.meta.env
+// used in the browser bundle. Env vars must be set in Vercel's
+// Environment Variables settings under these exact names.
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+
+// Support both naming conventions in case either is set in Vercel,
+// but SUPABASE_SERVICE_ROLE_KEY is Supabase's standard name and the
+// one that should be used going forward.
+const SUPABASE_SERVICE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+
 const FRONTEND_URL = process.env.VITE_APP_BASE_URL || "https://baby-boo-closet.vercel.app";
 
 if (!SUPABASE_URL) {
-  console.error("Missing VITE_SUPABASE_URL environment variable");
+  console.error("Missing VITE_SUPABASE_URL (or SUPABASE_URL) environment variable");
 }
 if (!SUPABASE_SERVICE_KEY) {
-  console.error("Missing SUPABASE_SERVICE_KEY environment variable");
+  console.error("Missing SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_KEY) environment variable");
 }
 
-const supabase = createClient(SUPABASE_URL || "", SUPABASE_SERVICE_KEY || "");
+// Fail fast with a clear message instead of letting createClient() throw
+// an opaque error that crashes every route in this file on import.
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  throw new Error(
+    "Supabase server credentials are not configured. Set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel's Environment Variables (Production)."
+  );
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 app.get("/api/products", async (req, res) => {
   const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
