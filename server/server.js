@@ -2,18 +2,44 @@ import express from "express";
 import { createClient } from "@supabase/supabase-js";
 import cors from "cors";
 import crypto from "crypto";
+import multer from "multer";
+import serverless from "serverless-http";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-const FRONTEND_URL = "http://localhost:5173";
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://mmhaxqcklycbkjihvngo.supabase.co";
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || "";
+// NOTE: process.env.* here refers to Vercel's serverless function
+// environment (Node.js), which is separate from Vite's import.meta.env
+// used in the browser bundle. Env vars must be set in Vercel's
+// Environment Variables settings under these exact names.
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+
+// Support both naming conventions in case either is set in Vercel,
+// but SUPABASE_SERVICE_ROLE_KEY is Supabase's standard name and the
+// one that should be used going forward.
+const SUPABASE_SERVICE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+
+const FRONTEND_URL = process.env.VITE_APP_BASE_URL || "https://baby-boo-closet.vercel.app";
+
+if (!SUPABASE_URL) {
+  console.error("Missing VITE_SUPABASE_URL (or SUPABASE_URL) environment variable");
+}
+if (!SUPABASE_SERVICE_KEY) {
+  console.error("Missing SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_KEY) environment variable");
+}
+
+// Fail fast with a clear message instead of letting createClient() throw
+// an opaque error that crashes every route in this file on import.
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  throw new Error(
+    "Supabase server credentials are not configured. Set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel's Environment Variables (Production)."
+  );
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// Products
 app.get("/api/products", async (req, res) => {
   const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
@@ -50,7 +76,6 @@ app.get("/api/featured", async (req, res) => {
   res.json(mapped);
 });
 
-// Orders
 app.post("/api/orders", async (req, res) => {
   const { order } = req.body;
   if (!order) return res.status(400).json({ error: "Missing order object" });
@@ -86,7 +111,6 @@ app.get("/api/orders", async (req, res) => {
   res.json(data);
 });
 
-// Admin: stats
 app.get("/api/admin/stats", async (req, res) => {
   const { count: totalProducts } = await supabase.from("products").select("*", { count: "exact", head: true });
   const { count: totalOrders } = await supabase.from("orders").select("*", { count: "exact", head: true });
@@ -95,7 +119,6 @@ app.get("/api/admin/stats", async (req, res) => {
   res.json({ totalProducts: totalProducts || 0, totalOrders: totalOrders || 0, revenue, customers: 0 });
 });
 
-// Admin: add product
 app.post("/api/admin/products", async (req, res) => {
   const product = req.body;
   if (!product.name || !product.price) return res.status(400).json({ error: "Missing required fields" });
@@ -111,7 +134,6 @@ app.post("/api/admin/products", async (req, res) => {
   res.json({ ok: true, product: data });
 });
 
-// Admin: update product
 app.put("/api/admin/products/:id", async (req, res) => {
   const { id } = req.params;
   const updates = {};
@@ -126,7 +148,6 @@ app.put("/api/admin/products/:id", async (req, res) => {
   res.json({ ok: true, product: data });
 });
 
-// Admin: delete product
 app.delete("/api/admin/products/:id", async (req, res) => {
   const { id } = req.params;
   const { error } = await supabase.from("products").delete().eq("id", id);
@@ -134,7 +155,6 @@ app.delete("/api/admin/products/:id", async (req, res) => {
   res.json({ ok: true, message: "Product deleted" });
 });
 
-// Admin: update featured
 app.put("/api/admin/featured", async (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids)) return res.status(400).json({ error: "ids must be an array" });
@@ -145,7 +165,6 @@ app.put("/api/admin/featured", async (req, res) => {
   res.json({ ok: true, ids });
 });
 
-// Stripe payment intent
 app.post("/api/create-payment-intent", async (req, res) => {
   const stripeSecret = process.env.STRIPE_SECRET_KEY;
   if (!stripeSecret) return res.status(500).json({ error: "Stripe secret key not configured" });
@@ -162,7 +181,6 @@ app.post("/api/create-payment-intent", async (req, res) => {
   }
 });
 
-// Stripe Checkout Session
 app.post("/api/create-checkout-session", async (req, res) => {
   const stripeSecret = process.env.STRIPE_SECRET_KEY;
   if (!stripeSecret) return res.status(500).json({ error: "Stripe secret key not configured" });
@@ -193,7 +211,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 });
 
-// Paystack: initialize transaction
 app.post("/api/paystack/initialize", async (req, res) => {
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
   if (!paystackSecret) return res.status(500).json({ error: "Paystack secret key not configured" });
@@ -221,7 +238,6 @@ app.post("/api/paystack/initialize", async (req, res) => {
   }
 });
 
-// Paystack: verify transaction
 app.get("/api/paystack/verify/:reference", async (req, res) => {
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
   if (!paystackSecret) return res.status(500).json({ error: "Paystack secret key not configured" });
@@ -241,7 +257,6 @@ app.get("/api/paystack/verify/:reference", async (req, res) => {
   }
 });
 
-// Paystack: webhook
 app.post("/api/paystack/webhook", express.raw({ type: "application/json" }), async (req, res) => {
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
   if (!paystackSecret) return res.status(500).json({ error: "Paystack secret key not configured" });
@@ -260,7 +275,37 @@ app.post("/api/paystack/webhook", express.raw({ type: "application/json" }), asy
   res.sendStatus(200);
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
+app.post("/api/custom-orders", upload.array("files"), async (req, res) => {
+  try {
+    const { body, files } = req;
+    const fileMeta = (files || []).map((f) => ({
+      originalName: f.originalname,
+      mimetype: f.mimetype,
+      size: f.size,
+    }));
+    const { data, error } = await supabase.from("custom_orders").insert({
+      full_name: body.fullName,
+      email: body.email,
+      phone: body.phone,
+      organization: body.organization || null,
+      garment_type: body.garmentType,
+      quantity: parseInt(body.quantity) || 1,
+      colors: body.colors,
+      embroidery_required: body.embroideryRequired === "true",
+      printing_required: body.printingRequired === "true",
+      delivery_date: body.deliveryDate,
+      additional_notes: body.additionalNotes || null,
+      file_count: parseInt(body.file_count) || 0,
+      file_metadata: fileMeta,
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ ok: true, id: data.id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save custom order" });
+  }
 });
+
+export const handler = serverless(app);
