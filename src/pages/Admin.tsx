@@ -35,6 +35,7 @@ const Admin = () => {
   const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, revenue: 0, customers: 0 });
   const { toast } = useToast();
 
+  const [activeTab, setActiveTab] = useState("products");
   const [featuredIds, setFeaturedIds] = useState<string[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -48,6 +49,20 @@ const Admin = () => {
     colors: [],
     sizes: []
   });
+
+  const resetProductForm = () => {
+    setNewProduct({
+      name: "",
+      price: 0,
+      originalPrice: 0,
+      image: "",
+      category: "",
+      isCustomizable: false,
+      colors: [],
+      sizes: []
+    });
+    setEditingProduct(null);
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -65,7 +80,8 @@ const Admin = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch(apiUrl("/api/products"));
+      const response = await fetch(apiUrl("/api/products"), { cache: "no-store" });
+      if (!response.ok) throw new Error(`Failed to load products (${response.status})`);
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -77,7 +93,8 @@ const Admin = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(apiUrl("/api/admin/stats"));
+      const response = await fetch(apiUrl("/api/admin/stats"), { cache: "no-store" });
+      if (!response.ok) throw new Error(`Failed to load stats (${response.status})`);
       const data = await response.json();
       setStats(data);
     } catch (error) {
@@ -87,7 +104,8 @@ const Admin = () => {
 
   const fetchFeatured = async () => {
     try {
-      const res = await fetch(apiUrl("/api/featured"));
+      const res = await fetch(apiUrl("/api/featured"), { cache: "no-store" });
+      if (!res.ok) return;
       const data = await res.json();
       setFeaturedIds(data.map((p: Product) => p.id));
     } catch {} // silent
@@ -133,7 +151,7 @@ const Admin = () => {
       sizes: product.sizes || []
     });
     setEditingProduct(product);
-    document.querySelector('[data-value="add"]')?.click();
+    setActiveTab("add");
   };
 
   const handleImageUpload = async (file: File) => {
@@ -154,10 +172,10 @@ const Admin = () => {
   };
 
   const addProduct = async () => {
-    if (!newProduct.name || !newProduct.price) {
+    if (!newProduct.name || !newProduct.price || !newProduct.category) {
       toast({
         title: "Missing Information",
-        description: "Please fill in product name and price",
+        description: "Please fill in product name, price, and category",
         variant: "destructive"
       });
       return;
@@ -170,35 +188,59 @@ const Admin = () => {
         : apiUrl("/api/admin/products");
       const method = isEditing ? "PUT" : "POST";
 
+      const payload = {
+        ...newProduct,
+        name: String(newProduct.name).trim(),
+        category: String(newProduct.category).trim(),
+        price: Number(newProduct.price) || 0,
+        originalPrice: Number(newProduct.originalPrice) || 0,
+        colors: newProduct.colors || [],
+        sizes: newProduct.sizes || [],
+        image: newProduct.image || "",
+        isCustomizable: !!newProduct.isCustomizable
+      };
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProduct)
+        body: JSON.stringify(payload)
       });
 
-      if (response.ok) {
+      if (!response.ok) {
+        const message = await response.text().catch(() => "");
+        throw new Error(message || `Request failed (${response.status})`);
+      }
+
+      const savedProduct = await response.json().catch(() => null);
+
+      if (isEditing) {
         await fetchProducts();
-        await fetchStats();
-        setNewProduct({
-          name: "",
-          price: 0,
-          originalPrice: 0,
-          image: "",
-          category: "",
-          isCustomizable: false,
-          colors: [],
-          sizes: []
-        });
-        setEditingProduct(null);
         toast({
-          title: isEditing ? "Product Updated" : "Product Added",
-          description: isEditing ? "Product has been updated successfully" : "Product has been added successfully"
+          title: "Product Updated",
+          description: "Product has been updated successfully"
+        });
+      } else if (savedProduct?.id) {
+        setProducts((prev) => [savedProduct, ...prev.filter((p) => p.id !== savedProduct.id)]);
+        toast({
+          title: "Product Added",
+          description: "Product has been added successfully"
+        });
+      } else {
+        await fetchProducts();
+        toast({
+          title: "Product Added",
+          description: "Product has been added successfully"
         });
       }
+
+      await fetchStats();
+      setActiveTab("products");
+      resetProductForm();
     } catch (error) {
+      console.error("Error saving product:", error);
       toast({
         title: "Error",
-        description: "Could not add product",
+        description: "Could not save product",
         variant: "destructive"
       });
     }
@@ -267,7 +309,7 @@ const Admin = () => {
           ))}
         </div>
 
-        <Tabs defaultValue="products" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white/5 border border-white/10 p-1 rounded-xl">
             <TabsTrigger value="products" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Products</TabsTrigger>
             <TabsTrigger value="add" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Add Product</TabsTrigger>
@@ -461,10 +503,14 @@ const Admin = () => {
 
                   <div className="flex gap-3">
                     {editingProduct && (
-                      <Button type="button" variant="outline" className="rounded-full h-11 border-white/10 flex-1" onClick={() => {
-                        setEditingProduct(null);
-                        setNewProduct({ name: "", price: 0, originalPrice: 0, image: "", category: "", isCustomizable: false, colors: [], sizes: [] });
-                      }}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="rounded-full h-11 border-white/10 flex-1"
+                        onClick={() => {
+                          resetProductForm();
+                        }}
+                      >
                         Cancel
                       </Button>
                     )}
