@@ -133,6 +133,9 @@ const Admin = () => {
         await fetchProducts();
         await fetchStats();
         toast({ title: "Deleted", description: `${name} has been removed` });
+      } else {
+        const message = await res.text().catch(() => "");
+        toast({ title: "Error", description: message || "Could not delete product", variant: "destructive" });
       }
     } catch {
       toast({ title: "Error", description: "Could not delete product", variant: "destructive" });
@@ -156,16 +159,30 @@ const Admin = () => {
 
   const handleImageUpload = async (file: File) => {
     try {
-      const driveUrl = `https://drive.google.com/uc?id=MOCK_FILE_ID_${Date.now()}`;
-      setNewProduct(prev => ({ ...prev, image: driveUrl }));
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+      const filePath = `products/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-image")
+        .upload(filePath, file, { cacheControl: "3600", upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("product-image")
+        .getPublicUrl(filePath);
+
+      setNewProduct(prev => ({ ...prev, image: urlData.publicUrl }));
       toast({
         title: "Image Uploaded",
-        description: "Image uploaded to Google Drive successfully"
+        description: "Image uploaded successfully"
       });
     } catch (error) {
+      console.error("Image upload failed:", error);
       toast({
         title: "Upload Failed",
-        description: "Could not upload image to Google Drive",
+        description: error instanceof Error ? error.message : "Could not upload image",
         variant: "destructive"
       });
     }
@@ -240,7 +257,7 @@ const Admin = () => {
       console.error("Error saving product:", error);
       toast({
         title: "Error",
-        description: "Could not save product",
+        description: error instanceof Error ? error.message : "Could not save product",
         variant: "destructive"
       });
     }
@@ -323,9 +340,17 @@ const Admin = () => {
                 {products.map((product) => (
                   <Card key={product.id} className="border-white/10 bg-card/90 group hover:border-primary/30 transition-all duration-300 overflow-hidden">
                     <div className="aspect-[4/3] bg-black/40 overflow-hidden">
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 via-kids-blue/10 to-background flex items-center justify-center">
-                        <span className="text-2xl font-bold text-primary/40">{product.name.charAt(0)}</span>
-                      </div>
+                      {product.image ? (
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 via-kids-blue/10 to-background flex items-center justify-center">
+                          <span className="text-2xl font-bold text-primary/40">{product.name.charAt(0)}</span>
+                        </div>
+                      )}
                     </div>
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between mb-3">
@@ -461,7 +486,7 @@ const Admin = () => {
                         <div className="flex flex-col items-center gap-1">
                           <Upload className="h-5 w-5 text-muted-foreground" />
                           <span className="text-sm font-normal text-muted-foreground">Click to upload image</span>
-                          <span className="text-xs text-muted-foreground">Uploads to Google Drive</span>
+                          <span className="text-xs text-muted-foreground">Uploads to secure storage</span>
                         </div>
                       </Button>
                     </div>
@@ -503,14 +528,7 @@ const Admin = () => {
 
                   <div className="flex gap-3">
                     {editingProduct && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="rounded-full h-11 border-white/10 flex-1"
-                        onClick={() => {
-                          resetProductForm();
-                        }}
-                      >
+                      <Button type="button" variant="outline" className="rounded-full h-11 border-white/10 flex-1" onClick={resetProductForm}>
                         Cancel
                       </Button>
                     )}
