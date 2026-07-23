@@ -3,7 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import cors from "cors";
 import crypto from "crypto";
 import multer from "multer";
-import serverless from "serverless-http";
 
 const app = express();
 app.use(cors());
@@ -308,4 +307,4 @@ app.post("/api/custom-orders", upload.array("files"), async (req, res) => {
   }
 });
 
-export const handler = serverless(app);
+export default app;
