@@ -68,8 +68,16 @@ const ProductCard = ({
     <Card className="group cursor-pointer overflow-hidden border-white/60 bg-white/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
       <CardContent className="p-0">
         <div className="relative overflow-hidden">
-          <div className="h-64 w-full bg-gradient-to-br from-primary/20 via-kids-blue/10 to-background flex items-center justify-center">
-            <span className="text-3xl font-bold text-primary/40">{name.charAt(0)}</span>
+          <div className="h-64 w-full bg-gradient-to-br from-primary/20 via-kids-blue/10 to-background flex items-center justify-center overflow-hidden">
+            {image ? (
+              <img
+                src={image}
+                alt={name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-3xl font-bold text-primary/40">{name.charAt(0)}</span>
+            )}
           </div>
           
           <div className="absolute top-3 left-3 flex flex-col gap-2">
