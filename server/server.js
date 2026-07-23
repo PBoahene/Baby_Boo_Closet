@@ -308,4 +308,4 @@ app.post("/api/custom-orders", upload.array("files"), async (req, res) => {
   }
 });
 
-export const handler = serverless(app);
+export default serverless(app);
