@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingBag, ArrowLeft, Truck, Shield, CreditCard } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Truck, Shield } from "lucide-react";
 import { CartItem, parseCart, subtotal as calculateSubtotal } from "@/lib/cart";
-import { APP_BASE_URL } from "@/lib/config";
 import { formatCurrency } from "@/lib/currency";
 
 const CartSummary = () => {
@@ -179,12 +178,11 @@ const CartSummary = () => {
                 </div>
           
                 <Button onClick={proceedToCheckout} className="w-full mt-4" size="lg">
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Proceed to Payment
+                  Proceed to Checkout
                 </Button>
 
                 <div className="text-center text-xs text-muted-foreground mt-2">
-                  Secure checkout powered by Paystack
+                  Admin will contact you for payment after order placement.
                 </div>
               </CardContent>
             </Card>
@@ -197,7 +195,7 @@ const CartSummary = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Shield className="h-4 w-4 text-green-600" />
-                      <span>100% Secure Payment</span>
+                      <span>Safe order confirmation</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Truck className="h-4 w-4 text-blue-600" />

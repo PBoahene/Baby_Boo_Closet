@@ -14,14 +14,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Smartphone, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { CartItem, parseCart, subtotal as calculateSubtotal } from "@/lib/cart";
 import { apiUrl } from "@/lib/config";
 import { formatCurrency } from "@/lib/currency";
-import { usePaystackPayment } from "react-paystack";
 
 const checkoutSchema = z.object({
   firstName: z.string().min(2, "First name required"),
@@ -32,9 +30,6 @@ const checkoutSchema = z.object({
   city: z.string().min(2, "City required"),
   postalCode: z.string().min(2, "Postal code required"),
   region: z.string().min(2, "Region required"),
-  paymentMethod: z.enum(["mtn", "vodafone", "airteltigo", "bank"], {
-    errorMap: () => ({ message: "Select payment method" }),
-  }),
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -44,7 +39,6 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [paymentRef, setPaymentRef] = useState<string>("");
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -57,7 +51,6 @@ const Checkout = () => {
       city: "",
       postalCode: "",
       region: "",
-      paymentMethod: "mtn",
     },
   });
 
@@ -76,31 +69,17 @@ const Checkout = () => {
   const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
 
-  const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "";
-
-  const initializePayment = usePaystackPayment({
-    publicKey,
-    email: "",
-    amount: 0,
-    currency: "GHS" as const,
-    channels: ["mobile_money"],
-    reference: "",
-  });
-
   const onSubmit = async (values: CheckoutFormValues) => {
     setIsProcessing(true);
 
     try {
-      const reference = `BB-${Date.now()}`;
-
       const orderPayload = {
         order: {
           ...values,
           total,
           items: cart,
-          status: "PENDING",
-          payment_reference: reference,
-          payment_method: values.paymentMethod,
+          status: "PENDING_PAYMENT",
+          payment_method: "manual_contact",
         },
       };
 
@@ -112,29 +91,8 @@ const Checkout = () => {
 
       if (!orderRes.ok) throw new Error("Failed to create order");
 
-      initializePayment({
-        config: {
-          email: values.email,
-          amount: Math.round(total * 100),
-          reference,
-          currency: "GHS",
-          channels: ["mobile_money"],
-        },
-        onSuccess: () => {
-          fetch(apiUrl(`/api/paystack/verify/${reference}`))
-            .then(() => {
-              localStorage.removeItem("cart");
-              navigate("/checkout/success");
-            })
-            .catch(() => {
-              navigate("/checkout/success");
-            });
-        },
-        onClose: () => {
-          setIsProcessing(false);
-          toast.error("Payment cancelled. Your order is saved as pending.");
-        },
-      });
+      localStorage.removeItem("cart");
+      navigate("/checkout/success");
     } catch (error) {
       console.error(error);
       toast.error("Failed to process order. Please try again.");
@@ -148,7 +106,7 @@ const Checkout = () => {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Checkout</h1>
           <div className="flex gap-4">
-            {[1, 2, 3].map((step) => (
+            {[1, 2].map((step) => (
               <div
                 key={step}
                 className={`flex items-center gap-2 pb-2 border-b-2 transition-colors ${
@@ -175,8 +133,6 @@ const Checkout = () => {
                 <span className="text-sm hidden sm:inline">
                   {step === 1
                     ? "Shipping"
-                    : step === 2
-                    ? "Payment"
                     : "Review"}
                 </span>
               </div>
@@ -347,116 +303,15 @@ const Checkout = () => {
                           onClick={form.handleSubmit(() => setCurrentStep(2))}
                           size="lg"
                         >
-                          Continue to Payment
+                          Continue to Review
                         </Button>
                       </div>
                     </CardContent>
                   </Card>
                 )}
 
-                {/* Step 2: Payment */}
+                {/* Step 2: Review */}
                 {currentStep === 2 && (
-                  <Card className="border-white/10 bg-card/90">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Smartphone className="h-5 w-5" />
-                        Payment Method
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="paymentMethod"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <RadioGroup
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <div className="space-y-3">
-                                  {[
-                                    {
-                                      id: "mtn",
-                                      label: "MTN Mobile Money",
-                                      icon: "📱",
-                                    },
-                                    {
-                                      id: "vodafone",
-                                      label: "Vodafone Cash",
-                                      icon: "💳",
-                                    },
-                                    {
-                                      id: "airteltigo",
-                                      label: "AirtelTigo Money",
-                                      icon: "🏦",
-                                    },
-                                    {
-                                      id: "bank",
-                                      label: "Bank Transfer",
-                                      icon: "🏛️",
-                                    },
-                                  ].map((method) => (
-                                    <div
-                                      key={method.id}
-                                      className="flex items-center space-x-2 p-3 rounded-lg border border-white/10 hover:border-primary/50 cursor-pointer transition-colors"
-                                    >
-                                      <RadioGroupItem
-                                        value={method.id}
-                                        id={method.id}
-                                      />
-                                      <label
-                                        htmlFor={method.id}
-                                        className="flex-1 cursor-pointer flex items-center gap-2"
-                                      >
-                                        <span>{method.icon}</span>
-                                        <span className="text-white">
-                                          {method.label}
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="rounded-lg bg-black/40 p-4 text-sm text-gray-300">
-                        <p className="font-medium text-white mb-1">
-                          Pay with Mobile Money
-                        </p>
-                        <p>
-                          You will be prompted to complete payment via Paystack.
-                          MTN, Vodafone, and AirtelTigo Mobile Money accepted.
-                        </p>
-                      </div>
-
-                      <div className="flex justify-between pt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setCurrentStep(1)}
-                          size="lg"
-                        >
-                          Back
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={form.handleSubmit(() => setCurrentStep(3))}
-                          size="lg"
-                        >
-                          Review Order
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Step 3: Review */}
-                {currentStep === 3 && (
                   <Card className="border-white/10 bg-card/90">
                     <CardHeader>
                       <CardTitle>Review Your Order</CardTitle>
@@ -475,19 +330,26 @@ const Checkout = () => {
                           {form.getValues("city")}, {form.getValues("region")}
                           <br />
                           {form.getValues("phone")}
+                          <br />
+                          {form.getValues("email")}
                         </p>
                       </div>
 
-                      <p className="text-sm text-gray-400">
-                        <strong>Payment Method:</strong>{" "}
-                        {form.getValues("paymentMethod").toUpperCase()}
-                      </p>
+                      <div className="rounded-lg bg-black/40 p-4 text-sm text-gray-300">
+                        <p className="font-medium text-white mb-1">
+                          Payment After Order
+                        </p>
+                        <p>
+                          After you place this order, our admin team will contact
+                          you using your phone number or email to complete payment.
+                        </p>
+                      </div>
 
                       <div className="flex justify-between pt-4">
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={() => setCurrentStep(2)}
+                          onClick={() => setCurrentStep(1)}
                           size="lg"
                         >
                           Back
@@ -499,7 +361,7 @@ const Checkout = () => {
                         >
                           {isProcessing
                             ? "Processing..."
-                            : `Pay ${formatCurrency(total)} with Momo`}
+                            : `Place Order ${formatCurrency(total)}`}
                         </Button>
                       </div>
                     </CardContent>
@@ -566,7 +428,7 @@ const Checkout = () => {
                 )}
 
                 <div className="text-center text-xs text-gray-500 mt-2">
-                  Secured by Paystack
+                  Admin will contact you to complete payment.
                 </div>
               </CardContent>
             </Card>

@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "scan:secrets": "gitleaks detect --source . --config .gitleaks.toml --redact",
+    "setup:hooks": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

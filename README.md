@@ -65,6 +65,25 @@ Backend (`server/.env`)
 - `PORT` - server port (default: `4000`)
 - `FRONTEND_URL` - frontend base URL for fallback checkout redirects (default: `http://localhost:5173`)
 
+## Secret Scanning
+
+This project includes `gitleaks` configuration to help prevent committing secrets.
+
+Setup (one-time):
+
+```bash
+# Install gitleaks (https://github.com/gitleaks/gitleaks)
+npm run setup:hooks
+```
+
+Run a manual scan:
+
+```bash
+npm run scan:secrets
+```
+
+After hook setup, each commit runs a staged secret scan using `.gitleaks.toml`.
+
 📁 **Project Structure (excerpt)**
 
 ```
