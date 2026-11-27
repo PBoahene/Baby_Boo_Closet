@@ -1,163 +1,107 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Heart, Palette } from "lucide-react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { CartItem, parseCart, serializeCart } from "@/lib/cart";
 import { formatCurrency } from "@/lib/currency";
+import type { Product } from "@/lib/catalog";
 
-interface ProductCardProps {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  category: string;
-  isCustomizable?: boolean;
-  colors?: string[];
-  sizes?: string[];
-}
+type ProductCardProps = Product;
 
-const ProductCard = ({ 
+const ProductCard = ({
   id,
-  name, 
-  price, 
-  originalPrice, 
-  image, 
-  category, 
-  isCustomizable = false,
-  colors = [],
-  sizes = []
+  name,
+  price,
+  originalPrice,
+  image,
+  category,
+  inStock = true,
 }: ProductCardProps) => {
   const { toast } = useToast();
-  const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+  const [imageFailed, setImageFailed] = useState(false);
+  const discount = originalPrice && originalPrice > price
+    ? Math.round(((originalPrice - price) / originalPrice) * 100)
+    : 0;
 
   function addToCart() {
     try {
-      const raw = localStorage.getItem("cart");
-      const cart = parseCart(raw);
-
+      const cart = parseCart(localStorage.getItem("cart"));
       const existing = cart.find((item) => item.id === id);
       if (existing) {
         existing.qty += 1;
       } else {
-        const newItem: CartItem = {
-          id,
-          name,
-          price,
-          qty: 1,
-          image,
-        };
+        const newItem: CartItem = { id, name, price, qty: 1, image };
         cart.push(newItem);
       }
-
       localStorage.setItem("cart", serializeCart(cart));
-      try {
-        window.dispatchEvent(new Event("storage"));
-      } catch (err) {
-        // ignore
-      }
+      window.dispatchEvent(new Event("storage"));
       toast({ title: "Added to cart", description: `${name} has been added to your cart.` });
-    } catch (err) {
+    } catch {
       // ignore localStorage errors
     }
   }
 
+  const showImage = image && !imageFailed;
+
   return (
-    <Card className="group cursor-pointer overflow-hidden border-white/60 bg-white/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
-      <CardContent className="p-0">
-        <div className="relative overflow-hidden">
-          <div className="h-64 w-full bg-gradient-to-br from-primary/20 via-kids-blue/10 to-background flex items-center justify-center overflow-hidden">
-            {image ? (
-              <img
-                src={image}
-                alt={name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="text-3xl font-bold text-primary/40">{name.charAt(0)}</span>
-            )}
+    <article className="group flex flex-col">
+      <Link
+        to={`/product/${id}`}
+        className="relative block aspect-square overflow-hidden bg-gray-50"
+        aria-label={name}
+      >
+        {showImage ? (
+          <img
+            src={image}
+            alt=""
+            loading="lazy"
+            onError={() => setImageFailed(true)}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 via-white to-kids-pink/10">
+            <span className="font-logo text-5xl font-bold text-primary/50">{name.charAt(0).toLowerCase()}</span>
           </div>
-          
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
-            {discount > 0 && (
-              <Badge variant="destructive" className="rounded-full px-2.5">
-                {discount}% OFF
-              </Badge>
-            )}
-          </div>
+        )}
+        {discount > 0 && (
+          <span className="absolute left-0 top-3 bg-kids-pink px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+            -{discount}%
+          </span>
+        )}
+      </Link>
 
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="absolute right-3 top-3 bg-background/85 opacity-0 transition-opacity hover:bg-background group-hover:opacity-100"
-          >
-            <Heart className="h-4 w-4" />
-          </Button>
+      <div className="flex flex-1 flex-col pt-4">
+        <Link to={`/product/${id}`} className="text-sm leading-snug text-gray-900 hover:underline">
+          {name}
+        </Link>
+        <span className="mt-2 block h-px w-5 bg-gray-900" aria-hidden="true" />
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-2">
+          <span className="text-[17px] text-gray-500">{formatCurrency(price)}</span>
+          {discount > 0 && (
+            <span className="text-sm text-gray-400 line-through">{formatCurrency(originalPrice!)}</span>
+          )}
         </div>
+        {discount > 0 ? (
+          <span className="text-sm font-medium text-kids-blue">On Sale</span>
+        ) : category ? (
+          <span className="text-sm text-kids-blue">{category}</span>
+        ) : null}
 
-        <div className="space-y-3 p-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary/85">{category}</p>
-              <h3 className="text-base font-semibold text-foreground transition-colors group-hover:text-primary">
-                {name}
-              </h3>
-            </div>
-          </div>
-
-          {colors.length > 0 && (
-            <div className="flex gap-1 mb-3">
-              {colors.slice(0, 4).map((color, index) => (
-                <div 
-                  key={index}
-                  className="w-4 h-4 rounded-full border border-border"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-              {colors.length > 4 && (
-                <span className="text-xs text-muted-foreground ml-1">
-                  +{colors.length - 4} more
-                </span>
-              )}
-            </div>
-          )}
-
-          {sizes.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-3">
-              {sizes.map((size, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {size}
-                </Badge>
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-primary">
-              {formatCurrency(price)}
-            </span>
-            {originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">
-                {formatCurrency(originalPrice)}
-              </span>
-            )}
-          </div>
-
-          <div className="flex gap-2 pt-1">
-            <Button onClick={addToCart} className="h-10 flex-1 rounded-full">
+        <div className="mt-auto flex justify-center pt-4">
+          {inStock ? (
+            <button
+              onClick={addToCart}
+              className="rounded-full border border-gray-900 px-6 py-2 text-sm text-gray-900 transition-colors hover:bg-gray-900 hover:text-white"
+            >
               Add to Cart
-            </Button>
-            {isCustomizable && (
-              <Button variant="outline" size="icon" className="h-10 w-10 rounded-full" aria-label="Customizable item">
-                <Palette className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+            </button>
+          ) : (
+            <button disabled className="cursor-not-allowed rounded-full bg-gray-300 px-6 py-2 text-sm text-white">
+              Out of Stock
+            </button>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </article>
   );
 };
 
