@@ -2,7 +2,7 @@ const messages = [
   "Free delivery on orders above GH₵300",
   "Pay easily with Mobile Money",
   "Bulk uniform orders for schools",
-  "Easy returns within 7 days",
+  "Custom embroidery & school badges",
 ];
 
 /** Scrolling promo strip under the banner. */

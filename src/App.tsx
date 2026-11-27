@@ -9,6 +9,7 @@ import Shop from "./pages/Shop";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 import SchoolKids from "./pages/SchoolKids";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
@@ -49,6 +50,7 @@ const App = () => {
           <Route path="/admin" element={<Admin />} />
           <Route path="/account" element={<Account />} />
           <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/school-kids" element={<SchoolKids />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/cart" element={<Cart />} />

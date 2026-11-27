@@ -19,7 +19,7 @@ const utilityLinks = [
   { to: "/shop", label: "Shop" },
   { to: "/custom-design", label: "Upload Design" },
   { to: "/school-kids", label: "School Orders" },
-  { to: "/about", label: "Contact" },
+  { to: "/contact", label: "Contact" },
 ];
 
 export const Logo = ({ size = "md" }) => {

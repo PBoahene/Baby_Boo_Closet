@@ -19,8 +19,9 @@ Live site: <https://baby-boo-closet.vercel.app>
 - **Cart** – quantity controls, order summary and a free-delivery progress bar (free over GH₵300)
 - **Checkout** – customers place the order with their delivery details, and the team contacts them to arrange payment (e.g. Mobile Money)
 - **Upload Your Design** – send logos or sketches for a custom quote
+- **Contact page** – phone, email, hours, quick answers and a message form that sends to WhatsApp
 - **WhatsApp Quick Order** button on every page
-- **Accounts** – sign up / log in with Supabase Auth
+- **Accounts** – sign up, log in and reset passwords with Supabase Auth
 
 ### For admins (`/admin`)
 - Add, edit and delete products, upload product photos
@@ -121,7 +122,9 @@ To change the category menu or the age ranges, edit `src/lib/catalog.ts`.
 | Checkout | `/checkout` | Delivery details and payment |
 | Upload Design | `/custom-design` | Custom order request with file upload |
 | School Kids | `/school-kids` | School uniform and bulk orders |
-| About / Contact | `/about` | Store story and contact details |
+| About | `/about` | Store story and values |
+| Contact | `/contact` | Phone, email, hours, FAQ and a message form that opens WhatsApp |
+| Login | `/login` | Sign in, register and password reset |
 | Account | `/account` | Customer account |
 | Admin | `/admin` | Store management (admins only) |
 
