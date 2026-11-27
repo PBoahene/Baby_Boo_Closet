@@ -22,29 +22,29 @@ const utilityLinks = [
   { to: "/about", label: "Contact" },
 ];
 
-const LogoMark = ({ className = "" }) => (
-  <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-    {/* little yellow bow */}
-    <path d="M20 20c-6-8-15-9-16-3s7 9 16 3z" fill="#F5B820" />
-    <path d="M20 20c6-8 15-9 16-3s-7 9-16 3z" fill="#F7C948" />
-    <path d="M20 20l-5 13 4-2 1 4 1-4 4 2z" fill="#F5B820" />
-    <circle cx="20" cy="20" r="3.4" fill="#E0A100" />
-  </svg>
-);
-
-export const Logo = () => (
-  <Link to="/" className="flex shrink-0 items-end gap-1" aria-label="Baby-Boo Closet home">
-    <LogoMark className="mb-3 h-7 w-7 md:h-9 md:w-9" />
-    <span className="font-logo leading-none text-gray-400">
-      <span className="block text-[30px] font-semibold tracking-tight md:text-[40px]">
-        baby<span className="text-primary">·</span>boo
+export const Logo = ({ size = "md" }) => {
+  const small = size === "sm";
+  return (
+    <Link to="/" className="flex shrink-0 items-center gap-2" aria-label="Baby-Boo Closet home">
+      <img
+        src="/brand/logo-mark.svg"
+        alt=""
+        className={small ? "h-11 w-11" : "h-12 w-12 md:h-16 md:w-16"}
+      />
+      <span className="leading-none">
+        <span
+          className={`block bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] bg-clip-text font-bold tracking-wide text-transparent ${small ? "text-xl" : "text-[22px] md:text-[28px]"}`}
+          style={{ fontFamily: "Georgia, serif" }}
+        >
+          Baby Boo
+        </span>
+        <span className={`mt-1 block font-semibold uppercase tracking-[0.4em] text-gray-400 ${small ? "text-[10px]" : "text-[10px] md:text-xs"}`}>
+          Closet
+        </span>
       </span>
-      <span className="-mt-0.5 block text-right text-[10px] font-bold uppercase tracking-[0.45em] text-gray-400 md:text-xs">
-        closet
-      </span>
-    </span>
-  </Link>
-);
+    </Link>
+  );
+};
 
 const Header = () => {
   const [count, setCount] = useState(0);

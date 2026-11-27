@@ -1,232 +1,177 @@
-# Baby_Boo_Closet 🛍️
+# Baby-Boo Closet 🛍️
 
-A modern React.js e-commerce platform specializing in kids' fashion and unisex underwear.
+An online store for **Baby-Boo Closet**, a Greater Accra kidswear brand selling school uniforms, everyday kids' clothing, underwear and custom-made pieces (embroidery, corporate and event wear).
 
-![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react)
-![React Router](https://img.shields.io/badge/React_Router-6.3.0-CA4245?style=for-the-badge&logo=react-router)
-![E-Commerce](https://img.shields.io/badge/E--Commerce-Platform-FF6B6B?style=for-the-badge)
+Live site: <https://baby-boo-closet.vercel.app>
+
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite)
+![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=for-the-badge&logo=supabase)
+![Vercel](https://img.shields.io/badge/Vercel-Hosting-000000?style=for-the-badge&logo=vercel)
 
 ## ✨ Features
 
-### 🎯 Customer Features
-- **Product Catalog** - Browse with search & filters
-- **User Authentication** - Secure login/register
-- **Shopping Cart** - Persistent cart storage
-- **Checkout Process** - Smooth order placement
-- **Order Tracking** - Real-time status updates
-- **Responsive Design** - Mobile-first approach
+### For shoppers
+- **Home page** – sliding promo banner, scrolling offers strip, trust badges and the product grid
+- **Category menu** – School Wear, Girls, Boys, Infant Wear, Underwear, Corporate and Custom Design, with dropdowns on desktop and a slide-down menu on phones
+- **Shop** – search, "Filter by" sidebar (category, price slider, **By Age**), sort, and Load More
+- **Shop by age** – products are tagged with age ranges: 0-6 months, 6-12 months, 12-18 months, 18-24 months, 2-3 years, 3-6 years, 6-9 years, 9-12 years and 12+ years
+- **Cart** – quantity controls, order summary and a free-delivery progress bar (free over GH₵300)
+- **Checkout** – customers place the order with their delivery details, and the team contacts them to arrange payment (e.g. Mobile Money)
+- **Upload Your Design** – send logos or sketches for a custom quote
+- **WhatsApp Quick Order** button on every page
+- **Accounts** – sign up / log in with Supabase Auth
 
-### ⚡ Admin Features
-- **Product Management** - Add/edit/delete products
-- **Inventory Control** - Stock management
-- **Admin Dashboard** - Full store control
-- **Order Management** - Process customer orders
+### For admins (`/admin`)
+- Add, edit and delete products, upload product photos
+- Tag each product with the **age ranges** it fits
+- Choose featured products, view orders and store stats
 
 ## 🚀 Quick Start
 
 ```bash
-# Clone repository
 git clone https://github.com/PBoahene/Baby_Boo_Closet.git
 cd Baby_Boo_Closet
-
-# Install frontend dependencies
 npm install
-
-# Configure frontend environment
-cp .env.example .env
-
-# Start the Vite dev server (http://localhost:5173)
-npm run dev
-
-# Run linting and tests
-npm run lint
-npm run test
-
-# Build for production
-npm run build
-
-# Backend API (Stripe checkout + product data)
-cd server
-npm install
-cp .env.example .env   # add STRIPE_SECRET_KEY (and optional FRONTEND_URL)
-npm run dev            # starts Express API on http://localhost:4000
+cp .env.example .env   # then fill in the values below
+npm run dev            # http://localhost:5173
 ```
 
-## Environment Variables
-
-Frontend (`.env`)
-
-- `VITE_API_BASE_URL` - API server base URL (default: `http://localhost:4000`)
-- `VITE_APP_BASE_URL` - public frontend base URL for Stripe redirects (default: current browser origin)
-
-Backend (`server/.env`)
-
-- `STRIPE_SECRET_KEY` - Stripe secret key
-- `PORT` - server port (default: `4000`)
-- `FRONTEND_URL` - frontend base URL for fallback checkout redirects (default: `http://localhost:5173`)
-
-## Secret Scanning
-
-This project includes `gitleaks` configuration to help prevent committing secrets.
-
-Setup (one-time):
+Other scripts:
 
 ```bash
-# Install gitleaks (https://github.com/gitleaks/gitleaks)
-npm run setup:hooks
+npm run lint      # ESLint
+npm run test      # Vitest
+npm run build     # production build into dist/
+npm run preview   # serve the production build locally
 ```
 
-Run a manual scan:
+> **Note:** the shop loads products from `/api/products`. In production Vercel runs `api/server.js` for every `/api/*` route. Locally, point `VITE_API_BASE_URL` at a running API (see [`server/README.md`](server/README.md)) or the shop will show "We couldn't load products right now".
 
-```bash
-npm run scan:secrets
-```
+## 🗄️ Database setup (Supabase)
 
-After hook setup, each commit runs a staged secret scan using `.gitleaks.toml`.
+Run these SQL files once in the Supabase SQL editor, in order:
 
-📁 **Project Structure (excerpt)**
+1. `supabase-migration.sql` – products, users and orders tables
+2. `add-product-sizes.sql` – **new:** adds the `sizes` column that stores each product's age ranges
+
+Until `add-product-sizes.sql` has been run, products can still be saved, but without age ranges — pick ages in Admin after running it.
+
+(`add-order-fields.sql`, `rls-fix.sql` and `first-admin.sql` are currently empty placeholders.)
+
+## 🔑 Environment variables
+
+Frontend (`.env`, read by Vite):
+
+| Name | Purpose |
+| --- | --- |
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase public (anon) key |
+| `VITE_API_BASE_URL` | API base URL; leave empty in production so `/api` on the same domain is used |
+| `VITE_APP_BASE_URL` | Public site URL used for payment redirects (defaults to the current origin) |
+
+API (`api/server.js`, set in Vercel → Project → Settings → Environment Variables):
+
+| Name | Purpose |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL (falls back to `VITE_SUPABASE_URL`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service key (server only — never expose it in the frontend) |
+| `PAYSTACK_SECRET_KEY` | Optional Paystack key for the Paystack API routes (not used by checkout today) |
+| `STRIPE_SECRET_KEY` | Optional Stripe key for the Stripe test routes |
+
+Never commit real keys. See **Secret scanning** below.
+
+## 📁 Project structure
 
 ```
 Baby_Boo_Closet/
-├── package.json
-├── vite.config.ts
+├── api/server.js            # Express API, deployed as a Vercel function
+├── server/                  # same API for running locally + sample data
+├── public/brand/            # logo.svg (full logo) and logo-mark.svg (icon)
 ├── src/
-│   ├── App.tsx
-│   ├── main.tsx
-│   ├── assets/
 │   ├── components/
+│   │   ├── Header.jsx        # logo, search, category menu, mobile drawer
+│   │   ├── BannerSlider.tsx  # home page promo slider
+│   │   ├── PromoTicker.tsx   # scrolling offers strip
+│   │   ├── TrustRow.tsx      # delivery / service / quality badges
+│   │   ├── ShopCatalog.tsx   # filters + product grid (home and shop)
 │   │   ├── ProductCard.tsx
-│   │   ├── FeaturedProducts.jsx
-│   │   └── ui/            # shadcn-ui primitives
-│   ├── hooks/
+│   │   ├── Footer.jsx
+│   │   └── ui/               # shadcn/ui building blocks
 │   ├── lib/
-│   │   └── cart.ts
-│   └── pages/
-│       ├── Index.tsx
-│       ├── Cart.tsx
-│       └── CheckoutSuccess.tsx
-└── server/
-	├── server.js
-	├── package.json
-	└── data/
+│   │   ├── catalog.ts        # product type, category menu, age ranges
+│   │   ├── cart.ts           # cart helpers (stored in localStorage)
+│   │   └── currency.ts       # GH₵ formatting
+│   └── pages/                # Index, Shop, ProductDetail, Cart, Checkout,
+│                             # CustomDesign, SchoolKids, Admin, Account, ...
+├── *.sql                    # Supabase migrations
+└── vercel.json              # routes /api/* to the API, everything else to the app
 ```
 
-### 🎨 Pages Overview
-Page	Description
-Home	Featured products & promotions
-Products	Catalog with filtering
-Product Detail	Individual product view
-Cart	Shopping cart management
-Checkout	Order completion
-Login/Register	User authentication
-Admin	Store management dashboard
+To change the category menu or the age ranges, edit `src/lib/catalog.ts`.
 
-###🔧 Tech Stack
-Frontend: React + TypeScript
+## 🎨 Pages
 
-Routing: React Router DOM
+| Page | Route | What it does |
+| --- | --- | --- |
+| Home | `/` | Banner slider, offers, trust badges, product grid |
+| Shop | `/shop` | Full catalog with filters; supports `?category=` and `?q=` |
+| Product | `/product/:id` | Product details |
+| Cart | `/cart` | Cart and order summary |
+| Checkout | `/checkout` | Delivery details and payment |
+| Upload Design | `/custom-design` | Custom order request with file upload |
+| School Kids | `/school-kids` | School uniform and bulk orders |
+| About / Contact | `/about` | Store story and contact details |
+| Account | `/account` | Customer account |
+| Admin | `/admin` | Store management (admins only) |
 
-State Management: React Hooks + TanStack Query
+## 🔧 Tech stack
 
-Storage: localStorage + Supabase
+- **Frontend:** React 18, TypeScript, React Router, TanStack Query
+- **Styling:** Tailwind CSS, shadcn/ui, lucide icons, Inter font
+- **Backend:** Express on Vercel serverless functions
+- **Database, auth & storage:** Supabase
+- **Payments:** arranged by the team after ordering; Paystack/Stripe API routes are available for future online payment
+- **Build & hosting:** Vite, Vercel
 
-HTTP Client: Fetch API + Supabase JS
+## 🔐 Secret scanning
 
-Styling: Tailwind CSS + shadcn/ui
+This project includes a `gitleaks` setup to stop secrets being committed.
 
-Build Tool: Vite
+```bash
+# one-time: install gitleaks (https://github.com/gitleaks/gitleaks), then
+npm run setup:hooks
 
-###📱 Responsive Design
-Fully optimized for:
+# manual scan
+npm run scan:secrets
+```
 
-📱 Mobile (320px+)
+After setup, every commit runs a staged secret scan using `.gitleaks.toml`.
 
-📟 Tablet (768px+)
+## 🤝 Contributing
 
-💻 Desktop (1200px+)
+1. Fork the project
+2. Create a branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m "Add my feature"`
+4. Push: `git push origin feature/my-feature`
+5. Open a pull request
 
-###🎯 Key Features
-Product Management
-Advanced filtering by category/price
+## 💡 Ideas for later
 
-Search functionality
+- Online payment at checkout (Paystack Mobile Money)
+- Wishlist and product reviews
+- Email / SMS order notifications
+- Gender and colour filters
+- Gift cards
 
-Product details with images
+## 👨‍💻 Development team
 
-Admin product CRUD operations
+Syntrix Software Engineering · DCIT208 Software Engineering Project · 2024/2025 · University of Ghana, Legon
 
-User Experience
-Persistent shopping cart
+## 📞 Support
 
-Smooth checkout flow
+Open a GitHub issue or email **Pbohene007@st.ug.edu.gh**.
 
-Order history tracking
+## 📝 License
 
-Responsive navigation
-
-Performance
-Fast loading (<3s)
-
-Optimized images
-
-Efficient state management
-
-Lighthouse score 90+
-
-###🔐 Security Features
-Client-side validation
-
-XSS protection
-
-Secure authentication flow
-
-HTTPS ready
-
-**🤝 Contributing**
-Fork the project
-
-Create feature branch (git checkout -b feature/AmazingFeature)
-
-Commit changes (git commit -m 'Add feature')
-
-Push to branch (git push origin feature/AmazingFeature)
-
-Open Pull Request
-
-**📝 License**
-MIT License - see LICENSE file for details.
-
-**👨‍💻 Development Team**
-
-Syntrix Software Engineering
-
-DCIT208 - Software Engineering Project
-
-2024/2025 Academic Year
-
-University of Ghana Legon.
-
-**💡 Future Enhancements**
-Backend API integration
-
-Payment gateway (Stripe/Momo)
-
-Email notifications
-
-Product reviews
-
-Wishlist functionality
-
-PWA capabilities
-
-Multi-language support
-
-⭐ Star this repo if you find it helpful!
-
-###📞 Support
-For questions or issues:
-
-Open a GitHub issue
-
-Email: Pbohene007@st.ug.edu.gh
-
+MIT License.

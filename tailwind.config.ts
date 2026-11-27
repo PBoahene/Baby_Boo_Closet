@@ -87,7 +87,7 @@ export default {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         serif: ['"Playfair Display"', "serif"],
-        logo: ["Comfortaa", "Quicksand", "sans-serif"],
+        logo: ["Georgia", "serif"],
       },
       keyframes: {
         ticker: {
