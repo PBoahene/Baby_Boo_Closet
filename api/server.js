@@ -50,8 +50,9 @@ app.get("/api/products", async (req, res) => {
     image: p.images?.[0] || "",
     category: p.category || "",
     isCustomizable: false,
+    inStock: (p.stock ?? 1) > 0,
     colors: [],
-    sizes: [],
+    sizes: Array.isArray(p.sizes) ? p.sizes : [],
   }));
   res.json(mapped);
 });
@@ -128,6 +129,7 @@ app.post("/api/admin/products", async (req, res) => {
     category: product.category || null,
     stock: product.stock ?? 100,
     images: product.image ? [product.image] : [],
+    ...(Array.isArray(product.sizes) && product.sizes.length ? { sizes: product.sizes } : {}),
   }).select().single();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true, product: data });
@@ -141,6 +143,7 @@ app.put("/api/admin/products/:id", async (req, res) => {
   if (req.body.category !== undefined) updates.category = req.body.category;
   if (req.body.stock !== undefined) updates.stock = req.body.stock;
   if (req.body.image !== undefined) updates.images = req.body.image ? [req.body.image] : [];
+  if (Array.isArray(req.body.sizes) && req.body.sizes.length) updates.sizes = req.body.sizes;
   const { data, error } = await supabase.from("products").update(updates).eq("id", id).select().single();
   if (error) return res.status(500).json({ error: error.message });
   if (!data) return res.status(404).json({ error: "Product not found" });

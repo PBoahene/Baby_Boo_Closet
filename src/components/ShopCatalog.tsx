@@ -4,7 +4,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import { apiUrl } from "@/lib/config";
-import { Product, sameCategory } from "@/lib/catalog";
+import { Product, ageGroups, sameCategory } from "@/lib/catalog";
 
 interface ShopCatalogProps {
   title: string;
@@ -13,8 +13,6 @@ interface ShopCatalogProps {
   headingLevel?: "h1" | "h2";
   pageSize?: number;
 }
-
-const sizeOptions = ["XS", "S", "M", "L", "XL"];
 
 const FilterSection = ({
   title,
@@ -47,6 +45,7 @@ const ShopCatalog = ({ title, subtitle, headingLevel = "h1", pageSize = 15 }: Sh
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  // Age groups chosen in the "By Age" filter (stored on products as `sizes`).
   const [sortBy, setSortBy] = useState("relevance");
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -193,16 +192,16 @@ const ShopCatalog = ({ title, subtitle, headingLevel = "h1", pageSize = 15 }: Sh
         </div>
       </FilterSection>
 
-      <FilterSection title="Size">
-        <div className="flex flex-wrap gap-2">
-          {sizeOptions.map((size) => (
+      <FilterSection title="By Age" defaultOpen>
+        <div className="grid grid-cols-2 gap-2">
+          {ageGroups.map((age) => (
             <button
-              key={size}
-              onClick={() => toggleSize(size)}
-              aria-pressed={selectedSizes.includes(size)}
-              className={`min-w-12 border px-3 py-1.5 text-sm ${selectedSizes.includes(size) ? "border-gray-900 bg-gray-900 text-white" : "border-gray-400 text-gray-800 hover:border-gray-900"}`}
+              key={age}
+              onClick={() => toggleSize(age)}
+              aria-pressed={selectedSizes.includes(age)}
+              className={`border px-2 py-1.5 text-[13px] ${selectedSizes.includes(age) ? "border-gray-900 bg-gray-900 text-white" : "border-gray-300 text-gray-800 hover:border-gray-900"}`}
             >
-              {size}
+              {age.replace(" months", "m").replace(" years", " yrs")}
             </button>
           ))}
         </div>

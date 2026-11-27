@@ -59,7 +59,7 @@ const ProductCard = ({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 via-white to-kids-pink/10">
-            <span className="font-logo text-5xl font-bold text-primary/50">{name.charAt(0).toLowerCase()}</span>
+            <span className="font-logo text-5xl font-bold text-[#B57BEF]/60">{name.charAt(0)}</span>
           </div>
         )}
         {discount > 0 && (

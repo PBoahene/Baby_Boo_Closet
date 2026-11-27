@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Logo } from "@/components/Header";
 import { Instagram, Mail, Phone } from "lucide-react";
 
 const Footer = () => {
@@ -7,12 +8,9 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-14">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div>
-            <div className="mb-5 flex items-center gap-3">
-              <img src="/brand/logo.svg" alt="Baby Boo" className="h-9 w-9 object-contain" />
-              <div>
-                <p className="text-sm font-bold leading-none" style={{ fontFamily: '"Outfit", sans-serif' }}>BABY-BOO CLOSET</p>
-                <p className="text-xs text-gray-400 mt-0.5">Modern Kidswear</p>
-              </div>
+            <div className="mb-6">
+              <Logo size="sm" />
+              <p className="mt-2 text-xs text-gray-500">Modern kidswear &amp; school uniforms</p>
             </div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Collections</h4>
             <ul className="space-y-2">
@@ -53,12 +51,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link to="/terms#orders" className="text-sm text-gray-600 hover:text-gray-900">
                   Shipping & Delivery
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link to="/terms#returns" className="text-sm text-gray-600 hover:text-gray-900">
                   Return and Refund Policy
                 </Link>
               </li>

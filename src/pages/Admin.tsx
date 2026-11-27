@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Plus, RefreshCw, Edit, Trash2, Upload, ShoppingBag, TrendingUp, DollarSign, Users, Star, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/config";
+import { ageGroups } from "@/lib/catalog";
 import { formatCurrency } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -499,17 +500,29 @@ const Admin = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="sizes" className="text-sm">Available Sizes</Label>
-                    <Input
-                      id="sizes"
-                      placeholder="XS, S, M, L, XL"
-                      onChange={(e) => setNewProduct(prev => ({
-                        ...prev,
-                        sizes: e.target.value.split(',').map(s => s.trim()).filter(s => s)
-                      }))}
-                      className="border-white/10 bg-background"
-                    />
-                    <p className="text-xs text-muted-foreground">Comma-separated list of sizes</p>
+                    <Label className="text-sm">Age Range</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {ageGroups.map((age) => {
+                        const selected = (newProduct.sizes || []).includes(age);
+                        return (
+                          <button
+                            key={age}
+                            type="button"
+                            aria-pressed={selected}
+                            onClick={() => setNewProduct(prev => ({
+                              ...prev,
+                              sizes: selected
+                                ? (prev.sizes || []).filter(s => s !== age)
+                                : [...(prev.sizes || []), age],
+                            }))}
+                            className={`rounded-full border px-3 py-1 text-xs ${selected ? "border-primary bg-primary text-gray-900" : "border-gray-300 text-gray-700 hover:border-gray-500"}`}
+                          >
+                            {age}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Pick every age this item fits. Shoppers filter by these in the shop.</p>
                   </div>
 
                   <label className="flex items-center gap-3 rounded-lg border border-white/10 bg-background px-4 py-3 cursor-pointer hover:bg-white/5 transition-colors">

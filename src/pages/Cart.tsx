@@ -13,7 +13,7 @@ const CartImage = ({ item }: { item: CartItem }) => {
   }
   return (
     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 to-kids-pink/10">
-      <span className="font-logo text-3xl font-bold text-primary/50">{item.name.charAt(0).toLowerCase()}</span>
+      <span className="font-logo text-3xl font-bold text-[#B57BEF]/60">{item.name.charAt(0)}</span>
     </div>
   );
 };

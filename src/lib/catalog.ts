@@ -56,5 +56,18 @@ export const categoryMenu: MenuGroup[] = [
   { label: "Custom Design", to: "/custom-design" },
 ];
 
+/** Age ranges used for sizing products and for the shop's "By Age" filter. */
+export const ageGroups = [
+  "0-6 months",
+  "6-12 months",
+  "12-18 months",
+  "18-24 months",
+  "2-3 years",
+  "3-6 years",
+  "6-9 years",
+  "9-12 years",
+  "12+ years",
+];
+
 export const sameCategory = (a: string, b: string) =>
   a.trim().toLowerCase() === b.trim().toLowerCase();
